@@ -15,7 +15,6 @@ import {
   CreateSpaceInput,
   CreateOpportunityInput,
   UpdateOpportunityInput,
-  CreateChallengeOnChallengeInput,
   AuthorizationCredential,
   CreateContributionOnCalloutInput,
   CreateCalloutOnCollaborationInput,
@@ -206,16 +205,6 @@ export class AlkemioClient {
     return data?.createChallenge;
   }
 
-  public async createChildChallenge(
-    challengeData: CreateChallengeOnChallengeInput
-  ) {
-    const result = await this.privateClient.createChildChallenge({
-      childChallengeData: challengeData,
-    });
-
-    return result.data?.createChildChallenge;
-  }
-
   public async createOpportunity(opportunityData: CreateOpportunityInput) {
     const result = await this.privateClient.createOpportunity({
       opportunityData: opportunityData,
@@ -372,18 +361,6 @@ export class AlkemioClient {
     });
   }
 
-  public async opportunityByNameID(spaceID: string, opportunityNameID: string) {
-    try {
-      const result = await this.privateClient.opportunity({
-        spaceID: spaceID,
-        opportunityID: opportunityNameID,
-      });
-      if (result.data) return result.data?.space.opportunity;
-    } catch (error) {
-      return;
-    }
-  }
-
   async challengeByNameID(spaceNameID: string, challengeNameID: string) {
     try {
       const response = await this.privateClient.challenge({
@@ -409,28 +386,6 @@ export class AlkemioClient {
     } catch (error) {
       return;
     }
-  }
-
-  async addUserToOpportunity(
-    spaceName: string,
-    opportunityName: string,
-    userID: string
-  ) {
-    const opportunityInfo = await this.opportunityByNameID(
-      spaceName,
-      opportunityName
-    );
-    const communityID = opportunityInfo?.community?.id;
-
-    if (!communityID) return;
-
-    return await this.privateClient.assignCommunityRoleToUser({
-      input: {
-        role: CommunityRole.Member,
-        userID: userID,
-        communityID: communityID,
-      },
-    });
   }
 
   async addUserToSpace(spaceID: string, userID: string) {
@@ -651,27 +606,6 @@ export class AlkemioClient {
     return data?.createCalloutOnCollaboration;
   }
 
-  async createUserGroupOnSpace(
-    spaceID: string,
-    groupName: string,
-    groupDesc: string
-  ) {
-    const spaceInfo = await this.spaceInfo(spaceID);
-    const communityID = spaceInfo?.community?.id;
-    if (!communityID) return;
-    const { data } = await this.privateClient.createGroupOnCommunity({
-      groupData: {
-        parentID: communityID,
-        profileData: {
-          description: groupDesc,
-          displayName: groupName,
-        },
-      },
-    });
-
-    return data?.createGroupOnCommunity;
-  }
-
   public async createOrganization(displayName: string, nameID: string) {
     const { data } = await this.privateClient.createOrganization({
       organizationData: {
@@ -769,19 +703,6 @@ export class AlkemioClient {
     return data?.createUser;
   }
 
-  public async groups(spaceID: string) {
-    const { data } = await this.privateClient.groups({
-      spaceID: spaceID,
-    });
-
-    return data?.space.community?.groups;
-  }
-
-  public async groupByName(spaceID: string, name: string) {
-    const groups = await this.groups(spaceID);
-    return groups?.find((x: { name: string }) => x.name === name);
-  }
-
   public async users() {
     const { data } = await this.privateClient.users();
 
@@ -819,14 +740,6 @@ export class AlkemioClient {
     const { data } = await this.privateClient.spaces();
 
     return data?.spaces;
-  }
-
-  public async opportunities(spaceID: string) {
-    const { data } = await this.privateClient.opportunities({
-      spaceID: spaceID,
-    });
-
-    return data?.space.opportunities;
   }
 
   async assignOrganizationAsCommunityLead(

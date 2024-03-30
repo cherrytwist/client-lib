@@ -10,9 +10,5 @@ fragment OpportunityDetails on Opportunity {
   }
   community {
     id
-    groups {
-      id
-      name
-    }
   }
 }

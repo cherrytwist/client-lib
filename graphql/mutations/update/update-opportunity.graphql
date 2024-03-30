@@ -5,11 +5,7 @@ mutation updateOpportunity(
     id
     nameID
     community {
-    id
-    groups {
       id
-      name
-      }
     }
     profile {
       displayName

@@ -1,8 +1,10 @@
 mutation updateSpace($spaceData: UpdateSpaceInput!) {
   updateSpace(spaceData: $spaceData) {
     nameID
-    host {
-      nameID
+    account {
+      host {
+        nameID
+      }
     }
     community {
       id

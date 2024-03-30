@@ -12,6 +12,7 @@ fragment UserDetails on User {
       uri
     }
     description
+    url
   }
   agent {
     id

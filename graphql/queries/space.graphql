@@ -2,11 +2,12 @@ query space($id: UUID_NAMEID!) {
   space(ID: $id) {
     id
     nameID
-    templates {
+    account {
       id
-      innovationFlowTemplates {
-        id
-        type
+      library {
+        innovationFlowTemplates {
+          id
+        }
       }
     }
     community {
