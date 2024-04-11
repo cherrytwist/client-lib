@@ -1,6 +1,6 @@
-query challenges($spaceID: UUID_NAMEID!) {
+query subspaces($spaceID: UUID_NAMEID!) {
   space(ID: $spaceID) {
-    challenges {
+    subspaces {
       id
       nameID
       profile {

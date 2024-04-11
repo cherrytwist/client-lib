@@ -4,17 +4,19 @@ import { GraphQLClient } from 'graphql-request';
 import { FileUpload } from 'graphql-upload';
 import semver from 'semver';
 import { AlkemioClientConfig } from './config/alkemio-client-config';
-import { CommunityRole, getSdk, InputMaybe, Sdk } from './generated/graphql';
 import {
-  CreateChallengeOnSpaceInput,
+  CommunityRole,
+  CreateAccountInput,
+  CreateSubspaceOnSpaceInput,
+  getSdk,
+  InputMaybe,
+  Sdk,
+} from './generated/graphql';
+import {
   UpdateSpaceInput,
-  UpdateChallengeInput,
   UpdateOrganizationInput,
   CreateUserInput,
   UpdateReferenceInput,
-  CreateSpaceInput,
-  CreateOpportunityInput,
-  UpdateOpportunityInput,
   AuthorizationCredential,
   CreateContributionOnCalloutInput,
   CreateCalloutOnCollaborationInput,
@@ -190,27 +192,19 @@ export class AlkemioClient {
     return response.data?.space;
   }
 
-  public async createSpace(spaceData: CreateSpaceInput) {
-    const result = await this.privateClient.createSpace({
-      spaceData: spaceData,
+  public async createSpace(accountData: CreateAccountInput) {
+    const result = await this.privateClient.createAccount({
+      accountData: accountData,
     });
-    return result.data?.createSpace;
+    return result.data?.createAccount;
   }
 
-  public async createChallenge(challenge: CreateChallengeOnSpaceInput) {
-    const { data } = await this.privateClient.createChallenge({
-      challengeData: challenge,
+  public async createSubspace(subspaceData: CreateSubspaceOnSpaceInput) {
+    const { data } = await this.privateClient.createSubspace({
+      subspaceData: subspaceData,
     });
 
-    return data?.createChallenge;
-  }
-
-  public async createOpportunity(opportunityData: CreateOpportunityInput) {
-    const result = await this.privateClient.createOpportunity({
-      opportunityData: opportunityData,
-    });
-
-    return result.data?.createOpportunity;
+    return data?.createSubspace;
   }
 
   public async addReference(
@@ -339,16 +333,16 @@ export class AlkemioClient {
     return !!data?.assignUserToOrganization;
   }
 
-  async addUserToChallenge(
+  async addUserToSubspace(
     spaceID: string,
-    challengeName: string,
+    subspaceNameID: string,
     userID: string
   ) {
-    const response = await this.privateClient.challenge({
+    const response = await this.privateClient.subspace({
       spaceID: spaceID,
-      challengeID: challengeName,
+      subspaceID: subspaceNameID,
     });
-    const communityID = response.data?.space.challenge?.community?.id;
+    const communityID = response.data?.space.subspace?.community?.id;
 
     if (!response || !communityID) return;
 
@@ -361,15 +355,15 @@ export class AlkemioClient {
     });
   }
 
-  async challengeByNameID(spaceNameID: string, challengeNameID: string) {
+  async subspaceByNameID(spaceNameID: string, subspaceNameID: string) {
     try {
-      const response = await this.privateClient.challenge({
+      const response = await this.privateClient.subspace({
         spaceID: spaceNameID,
-        challengeID: challengeNameID,
+        subspaceID: subspaceNameID,
       });
 
       if (!response) return;
-      return response.data?.space.challenge;
+      return response.data?.space.subspace;
     } catch (error) {
       return;
     }
@@ -475,84 +469,6 @@ export class AlkemioClient {
       );
   }
 
-  async createRelationOnCollaboration(
-    collaborationID: string,
-    type: string,
-    description: string,
-    actorName: string,
-    actorRole: string,
-    actorType: string
-  ) {
-    const { data } = await this.privateClient.createRelationOnCollaboration({
-      relationData: {
-        collaborationID,
-        type,
-        description,
-        actorName,
-        actorType,
-        actorRole,
-      },
-    });
-
-    return data?.createRelationOnCollaboration;
-  }
-
-  async createActorGroup(
-    ecosystemModelID: string,
-    actorGroupName: string,
-    description: string
-  ) {
-    const { data } = await this.privateClient.createActorGroup({
-      actorGroupData: {
-        ecosystemModelID: ecosystemModelID,
-        name: actorGroupName,
-        description,
-      },
-    });
-
-    return data?.createActorGroup;
-  }
-
-  async createActor(
-    actorGroupID: string,
-    actorName: string,
-    value?: string,
-    impact?: string,
-    description = ''
-  ) {
-    const { data } = await this.privateClient.createActor({
-      actorData: {
-        actorGroupID: actorGroupID,
-        name: actorName,
-        value,
-        impact,
-        description,
-      },
-    });
-
-    return data?.createActor;
-  }
-
-  async updateActor(
-    actorID: string,
-    actorName: string,
-    value: string,
-    impact = '',
-    description = ''
-  ) {
-    const { data } = await this.privateClient.updateActor({
-      actorData: {
-        ID: actorID,
-        name: actorName,
-        value,
-        impact,
-        description,
-      },
-    });
-
-    return data?.updateActor;
-  }
-
   // Create a post for the given callout
   async createPostOnCallout(
     calloutID: string,
@@ -629,24 +545,14 @@ export class AlkemioClient {
     return data?.deleteOrganization;
   }
 
-  public async deleteOpportunity(opportunityID: string) {
-    const { data } = await this.privateClient.deleteOpportunity({
+  public async deleteSpace(spaceID: string) {
+    const { data } = await this.privateClient.deleteSpace({
       deleteData: {
-        ID: opportunityID,
+        ID: spaceID,
       },
     });
 
-    return data?.deleteOpportunity;
-  }
-
-  public async deleteChallenge(challengeID: string) {
-    const { data } = await this.privateClient.deleteChallenge({
-      deleteData: {
-        ID: challengeID,
-      },
-    });
-
-    return data?.deleteChallenge;
+    return data?.deleteSpace;
   }
 
   public async organizations() {
@@ -663,28 +569,12 @@ export class AlkemioClient {
     return data?.organization;
   }
 
-  public async challenges(spaceID: string) {
-    const { data } = await this.privateClient.challenges({
+  public async subspaces(spaceID: string) {
+    const { data } = await this.privateClient.subspaces({
       spaceID: spaceID,
     });
 
-    return data?.space.challenges;
-  }
-
-  public async updateChallenge(challenge: UpdateChallengeInput) {
-    const { data } = await this.privateClient.updateChallenge({
-      challengeData: challenge,
-    });
-
-    return data?.updateChallenge;
-  }
-
-  public async updateOpportunity(opportunity: UpdateOpportunityInput) {
-    const { data } = await this.privateClient.updateOpportunity({
-      opportunityData: opportunity,
-    });
-
-    return data?.updateOpportunity;
+    return data?.space.subspaces;
   }
 
   public async updateOrganization(organization: UpdateOrganizationInput) {

@@ -1,5 +1,0 @@
-mutation updateActor($actorData: UpdateActorInput!) {
-  updateActor(actorData: $actorData) {
-    name
-  }
-}

@@ -1,7 +1,0 @@
-mutation updateChallenge(
-  $challengeData: UpdateChallengeInput!
-) {
-  updateChallenge(challengeData: $challengeData) {
-    ...ChallengeDetails
-  }
-}

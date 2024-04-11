@@ -1,4 +1,4 @@
-fragment ChallengeDetails on Challenge {
+fragment SpaceDetails on Space {
   id
   nameID
   profile {

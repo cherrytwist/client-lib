@@ -1,9 +1,0 @@
-mutation createActor($actorData: CreateActorInput!) {
-  createActor(actorData: $actorData) {
-    id
-    name
-    description
-    value
-    impact
-  }
-}

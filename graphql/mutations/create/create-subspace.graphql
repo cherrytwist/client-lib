@@ -1,5 +1,5 @@
-mutation createChallenge($challengeData: CreateChallengeOnSpaceInput!) {
-  createChallenge(challengeData: $challengeData) {
+mutation createSubspace($subspaceData: CreateSubspaceOnSpaceInput!) {
+  createSubspace(subspaceData: $subspaceData) {
     id
     nameID
     profile {
