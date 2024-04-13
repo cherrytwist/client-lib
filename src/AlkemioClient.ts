@@ -7,7 +7,7 @@ import { AlkemioClientConfig } from './config/alkemio-client-config';
 import {
   CommunityRole,
   CreateAccountInput,
-  CreateSubspaceOnSpaceInput,
+  CreateSubspaceInput,
   getSdk,
   InputMaybe,
   Sdk,
@@ -199,7 +199,7 @@ export class AlkemioClient {
     return result.data?.createAccount;
   }
 
-  public async createSubspace(subspaceData: CreateSubspaceOnSpaceInput) {
+  public async createSubspace(subspaceData: CreateSubspaceInput) {
     const { data } = await this.privateClient.createSubspace({
       subspaceData: subspaceData,
     });
