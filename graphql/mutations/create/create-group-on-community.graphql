@@ -1,9 +1,9 @@
 mutation createGroupOnCommunity($groupData: CreateUserGroupInput!) {
   createGroupOnCommunity(groupData: $groupData) {
-    name
     id
     profile {
       id
+      displayName
       visual(type: AVATAR) {
          id
       }

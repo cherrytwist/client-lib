@@ -1,4 +1,4 @@
-fragment ChallengeDetails on Challenge {
+fragment SpaceDetails on Space {
   id
   nameID
   profile {
@@ -15,20 +15,8 @@ fragment ChallengeDetails on Challenge {
   }
   community {
     id
-    groups {
-      id
-      name
-    }
   }
   context {
     id
-
-    ecosystemModel {
-      id
-      actorGroups {
-        name
-        id
-      }
-    }
   }
 }
