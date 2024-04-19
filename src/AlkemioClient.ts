@@ -6,8 +6,6 @@ import semver from 'semver';
 import { AlkemioClientConfig } from './config/alkemio-client-config';
 import {
   CommunityRole,
-  CreateAccountInput,
-  CreateSubspaceInput,
   getSdk,
   InputMaybe,
   Sdk,
@@ -185,26 +183,19 @@ export class AlkemioClient {
     return true;
   }
 
+  async ingestSpace(spaceNameID: string) {
+    const response = await this.privateClient.spaceIngest({
+      spaceNameID
+    });
+    return response.data?.space;
+
+  }
+
   async spaceInfo(spaceID: string) {
     const response = await this.privateClient.space({
       id: spaceID,
     });
     return response.data?.space;
-  }
-
-  public async createSpace(accountData: CreateAccountInput) {
-    const result = await this.privateClient.createAccount({
-      accountData: accountData,
-    });
-    return result.data?.createAccount;
-  }
-
-  public async createSubspace(subspaceData: CreateSubspaceInput) {
-    const { data } = await this.privateClient.createSubspace({
-      subspaceData: subspaceData,
-    });
-
-    return data?.createSubspace;
   }
 
   public async addReference(
@@ -331,42 +322,6 @@ export class AlkemioClient {
     });
 
     return !!data?.assignUserToOrganization;
-  }
-
-  async addUserToSubspace(
-    spaceID: string,
-    subspaceNameID: string,
-    userID: string
-  ) {
-    const response = await this.privateClient.subspace({
-      spaceID: spaceID,
-      subspaceID: subspaceNameID,
-    });
-    const communityID = response.data?.space.subspace?.community?.id;
-
-    if (!response || !communityID) return;
-
-    return await this.privateClient.assignCommunityRoleToUser({
-      input: {
-        role: CommunityRole.Member,
-        userID: userID,
-        communityID: communityID,
-      },
-    });
-  }
-
-  async subspaceByNameID(spaceNameID: string, subspaceNameID: string) {
-    try {
-      const response = await this.privateClient.subspace({
-        spaceID: spaceNameID,
-        subspaceID: subspaceNameID,
-      });
-
-      if (!response) return;
-      return response.data?.space.subspace;
-    } catch (error) {
-      return;
-    }
   }
 
   async user(userID: string) {
@@ -567,14 +522,6 @@ export class AlkemioClient {
     });
 
     return data?.organization;
-  }
-
-  public async subspaces(spaceID: string) {
-    const { data } = await this.privateClient.subspaces({
-      spaceID: spaceID,
-    });
-
-    return data?.space.subspaces;
   }
 
   public async updateOrganization(organization: UpdateOrganizationInput) {

@@ -12,7 +12,7 @@
     "prebuild": "npm run clean",
     "clean": "rimraf ./dist",
     "format": "prettier --write \"src/**/*.ts\" \"graphql/**/*.graphql\"",
-    "codegen": "graphql-codegen --config codegen.yml",
+    "codegen": "graphql-codegen -v --config codegen.yml",
     "lint": "tsc --noEmit && eslint src/**/*.ts{,x}",
     "lint:fix": "tsc --noEmit && eslint src/**/*.ts{,x} --fix",
     "validate-connection": "ts-node-dev src/validate-connection.ts",
