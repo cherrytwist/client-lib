@@ -192,6 +192,13 @@ export class AlkemioClient {
     return response.data?.space;
   }
 
+  public async ingestSpace(spaceID: string) {
+    const response = await this.privateClient.spaceIngest({
+      spaceNameID: spaceID,
+    });
+    return response.data?.space;
+  }
+
   public async createSpace(accountData: CreateAccountInput) {
     const result = await this.privateClient.createAccount({
       accountData: accountData,
