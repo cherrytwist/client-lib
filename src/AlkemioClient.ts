@@ -29,6 +29,11 @@ import { log, LOG_LEVEL } from './util/logger';
 import { toGraphQLResponse } from './util/toGraphQLResponse';
 import * as SchemaTypes from './types/alkemio-schema';
 
+const fileUploadHeaders = {
+  'apollo-require-preflight': 'true',
+  'x-apollo-operation-name': 'true',
+};
+
 export class AlkemioClient {
   public apiToken: string;
   public config!: AlkemioClientConfig;
@@ -418,10 +423,13 @@ export class AlkemioClient {
     }
 
     return this.privateClient
-      .uploadFileOnReference({
-        file: createReadStream(path) as unknown as FileUpload,
-        uploadData: { referenceID },
-      })
+      .uploadFileOnReference(
+        {
+          file: createReadStream(path) as unknown as FileUpload,
+          uploadData: { referenceID },
+        },
+        fileUploadHeaders
+      )
       .then(
         toGraphQLResponse<SchemaTypes.UploadFileOnReferenceMutation>,
         toGraphQLResponse<SchemaTypes.UploadFileOnReferenceMutation>
@@ -434,10 +442,13 @@ export class AlkemioClient {
     }
 
     return this.privateClient
-      .uploadFileOnLink({
-        file: createReadStream(path) as unknown as FileUpload,
-        uploadData: { linkID },
-      })
+      .uploadFileOnLink(
+        {
+          file: createReadStream(path) as unknown as FileUpload,
+          uploadData: { linkID },
+        },
+        fileUploadHeaders
+      )
       .then(
         toGraphQLResponse<SchemaTypes.UploadFileOnLinkMutation>,
         toGraphQLResponse<SchemaTypes.UploadFileOnLinkMutation>
@@ -450,10 +461,13 @@ export class AlkemioClient {
     }
 
     return this.privateClient
-      .uploadImageOnVisual({
-        file: createReadStream(path) as unknown as FileUpload,
-        uploadData: { visualID },
-      })
+      .uploadImageOnVisual(
+        {
+          file: createReadStream(path) as unknown as FileUpload,
+          uploadData: { visualID },
+        },
+        fileUploadHeaders
+      )
       .then(
         toGraphQLResponse<SchemaTypes.UploadImageOnVisualMutation>,
         toGraphQLResponse<SchemaTypes.UploadImageOnVisualMutation>
@@ -466,10 +480,13 @@ export class AlkemioClient {
     }
 
     return this.privateClient
-      .uploadFileOnStorageBucket({
-        file: createReadStream(path) as unknown as FileUpload,
-        uploadData: { storageBucketId: storageBucketID },
-      })
+      .uploadFileOnStorageBucket(
+        {
+          file: createReadStream(path) as unknown as FileUpload,
+          uploadData: { storageBucketId: storageBucketID },
+        },
+        fileUploadHeaders
+      )
       .then(
         toGraphQLResponse<SchemaTypes.UploadFileOnStorageBucketMutation>,
         toGraphQLResponse<SchemaTypes.UploadFileOnStorageBucketMutation>
