@@ -39,7 +39,12 @@ export class AlkemioClient {
     this.config = config;
     this.config.loggingEnabled = config.loggingEnabled ?? false;
     const privateClient = new GraphQLClient(
-      this.config.apiEndpointPrivateGraphql
+      this.config.apiEndpointPrivateGraphql,
+      {
+        headers: {
+          'apollo-require-preflight': 'true',
+        },
+      }
     );
     this.privateClient = getSdk(privateClient);
   }
