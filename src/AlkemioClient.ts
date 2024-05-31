@@ -199,9 +199,9 @@ export class AlkemioClient {
 
   public async ingestSpace(spaceID: string) {
     const response = await this.privateClient.spaceIngest({
-      spaceNameID: spaceID,
+      spaceID: spaceID,
     });
-    return response.data?.space;
+    return response.data?.lookup.space;
   }
 
   public async createSpace(accountData: CreateAccountInput) {
@@ -339,10 +339,11 @@ export class AlkemioClient {
       input: {
         userID: uID,
         organizationID: gID,
+        role: SchemaTypes.OrganizationRole.Associate,
       },
     });
 
-    return !!data?.assignUserToOrganization;
+    return !!data?.assignOrganizationRoleToUser;
   }
 
   async addUserToSubspace(
@@ -772,5 +773,12 @@ export class AlkemioClient {
         referenceInput: input,
       });
     }
+  }
+
+  async document(documentID: string) {
+    const response = await this.privateClient.document({
+      id: documentID,
+    });
+    return response.data?.lookup.document;
   }
 }
