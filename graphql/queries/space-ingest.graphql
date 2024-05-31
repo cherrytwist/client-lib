@@ -1,39 +1,6 @@
-query spaceIngest(
-  $spaceNameID: UUID_NAMEID!
-  ){
-  space(ID: $spaceNameID) {
-    id
-    nameID
-    type
-    profile {
-      description
-      displayName
-      tagline
-      url
-      location {
-        city
-        country
-        postalCode
-      }
-      tagset {
-        tags
-      }
-      references {
-        description
-        name
-        uri
-      }
-      visuals {
-        uri
-        name
-      }
-    }
-    context {
-      vision
-      impact
-      who
-    }
-    subspaces {
+query spaceIngest($spaceID: UUID!){
+  lookup {
+    space(ID: $spaceID) {
       id
       nameID
       type
@@ -65,59 +32,73 @@ query spaceIngest(
         impact
         who
       }
-      collaboration {
-        callouts {
-          id
-          nameID
-          type
-          comments {
-            messagesCount
-            messages {
-              sender {
-                ... on User {
-                  profile {
-                    url
-                    displayName
+      subspaces {
+        id
+        nameID
+        type
+        profile {
+          description
+          displayName
+          tagline
+          url
+          location {
+            city
+            country
+            postalCode
+          }
+          tagset {
+            tags
+          }
+          references {
+            description
+            name
+            uri
+          }
+          visuals {
+            uri
+            name
+          }
+        }
+        context {
+          vision
+          impact
+          who
+        }
+        collaboration {
+          callouts {
+            id
+            nameID
+            type
+            comments {
+              messagesCount
+              messages {
+                sender {
+                  ... on User {
+                    profile {
+                      url
+                      displayName
+                    }
+                  }
+                  ... on VirtualContributor {
+                    profile {
+                      url
+                      displayName
+                    }
                   }
                 }
-                ... on VirtualContributor {
-                  profile {
-                    url
-                    displayName
-                  }
-                }
-              }
-              message
-              timestamp
-            }
-          }
-          framing {
-            profile {
-              description
-              displayName
-              tagline
-              url
-              tagset {
-                tags
-              }
-              references {
-                description
-                name
-                uri
-              }
-              visuals {
-                uri
-                name
+                message
+                timestamp
               }
             }
-          }
-          contributions {
-            link {
+            framing {
               profile {
                 description
                 displayName
+                tagline
                 url
-
+                tagset {
+                  tags
+                }
                 references {
                   description
                   name
@@ -126,6 +107,26 @@ query spaceIngest(
                 visuals {
                   uri
                   name
+                }
+              }
+            }
+            contributions {
+              link {
+                uri
+                profile {
+                  description
+                  displayName
+                  url
+                  type
+                  references {
+                    description
+                    name
+                    uri
+                  }
+                  visuals {
+                    uri
+                    name
+                  }
                 }
               }
             }
