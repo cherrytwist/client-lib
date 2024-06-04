@@ -4,7 +4,7 @@ dotenv.config();
 import * as winston from 'winston';
 
 export const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL ?? 'info',
+  level: (process.env.LOG_LEVEL ?? 'info').toLowerCase(),
   format: winston.format.json(),
   defaultMeta: { service: 'client-lib' },
   transports: [
