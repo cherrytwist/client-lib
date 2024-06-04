@@ -69,6 +69,8 @@ export type Account = {
   spaceID: Scalars['String'];
   /** The subscriptions active for this Account. */
   subscriptions: Array<AccountSubscription>;
+  /** The virtual contributors for this Account. */
+  virtualContributors: Array<VirtualContributor>;
 };
 
 export type AccountAuthorizationResetInput = {
@@ -747,6 +749,7 @@ export enum AuthorizationPrivilege {
 }
 
 export enum BodyOfKnowledgeType {
+  Other = 'OTHER',
   Space = 'SPACE',
 }
 
@@ -1698,8 +1701,8 @@ export type CreateUserInput = {
 
 export type CreateVirtualContributorOnAccountInput = {
   accountID: Scalars['UUID'];
-  bodyOfKnowledgeID: Scalars['UUID'];
-  bodyOfKnowledgeType: BodyOfKnowledgeType;
+  bodyOfKnowledgeID?: InputMaybe<Scalars['UUID']>;
+  bodyOfKnowledgeType?: InputMaybe<BodyOfKnowledgeType>;
   /** A readable identifier, unique within the containing scope. */
   nameID: Scalars['NameID'];
   profileData: CreateProfileInput;
@@ -1815,6 +1818,10 @@ export type DeleteCalloutTemplateInput = {
 };
 
 export type DeleteCollaborationInput = {
+  ID: Scalars['UUID'];
+};
+
+export type DeleteCommunityGuidelinesTemplateInput = {
   ID: Scalars['UUID'];
 };
 
@@ -2081,6 +2088,11 @@ export type IngestResult = {
   index: Scalars['String'];
   /** Amount of documents indexed. */
   total?: Maybe<Scalars['Float']>;
+};
+
+export type IngestSpaceInput = {
+  /** The identifier for the Space to be ingested. */
+  spaceID: Scalars['UUID'];
 };
 
 export type InnovationFlow = {
@@ -2714,6 +2726,8 @@ export type Mutation = {
   deleteCalloutTemplate: CalloutTemplate;
   /** Delete Collaboration. */
   deleteCollaboration: Collaboration;
+  /** Deletes the specified CommunityGuidelines Template. */
+  deleteCommunityGuidelinesTemplate: CommunityGuidelinesTemplate;
   /** Deletes the specified Discussion. */
   deleteDiscussion: Discussion;
   /** Deletes the specified Document. */
@@ -2772,6 +2786,8 @@ export type Mutation = {
   grantCredentialToUser: User;
   /** Resets the interaction with the chat engine. */
   ingest: Scalars['Boolean'];
+  /** Triggers space ingestion. */
+  ingestSpace: Space;
   /** Invite an existing User to join the specified Community as a member. */
   inviteExistingUserForCommunityMembership: Array<Invitation>;
   /** Invite an external User to join the specified Community as a member. */
@@ -2836,6 +2852,8 @@ export type Mutation = {
   updateCommunityApplicationForm: Community;
   /** Updates the CommunityGuidelines. */
   updateCommunityGuidelines: CommunityGuidelines;
+  /** Updates the specified CommunityGuidelinesTemplate. */
+  updateCommunityGuidelinesTemplate: CommunityGuidelinesTemplate;
   /** Updates the specified Discussion. */
   updateDiscussion: Discussion;
   /** Updates the specified Document. */
@@ -2894,6 +2912,8 @@ export type Mutation = {
   updateUserPlatformSettings: User;
   /** Updates the specified VirtualContributor. */
   updateVirtualContributor: VirtualContributor;
+  /** Update VirtualContributor Platform Settings. */
+  updateVirtualContributorPlatformSettings: VirtualContributor;
   /** Updates the specified VirtualPersona. */
   updateVirtualPersona: VirtualPersona;
   /** Updates the image URI for the specified Visual. */
@@ -3115,6 +3135,10 @@ export type MutationDeleteCollaborationArgs = {
   deleteData: DeleteCollaborationInput;
 };
 
+export type MutationDeleteCommunityGuidelinesTemplateArgs = {
+  deleteData: DeleteCommunityGuidelinesTemplateInput;
+};
+
 export type MutationDeleteDiscussionArgs = {
   deleteData: DeleteDiscussionInput;
 };
@@ -3225,6 +3249,10 @@ export type MutationGrantCredentialToOrganizationArgs = {
 
 export type MutationGrantCredentialToUserArgs = {
   grantCredentialData: GrantAuthorizationCredentialInput;
+};
+
+export type MutationIngestSpaceArgs = {
+  ingestSpaceData: IngestSpaceInput;
 };
 
 export type MutationInviteExistingUserForCommunityMembershipArgs = {
@@ -3351,6 +3379,10 @@ export type MutationUpdateCommunityGuidelinesArgs = {
   communityGuidelinesData: UpdateCommunityGuidelinesInput;
 };
 
+export type MutationUpdateCommunityGuidelinesTemplateArgs = {
+  communityGuidelinesTemplateInput: UpdateCommunityGuidelinesTemplateInput;
+};
+
 export type MutationUpdateDiscussionArgs = {
   updateData: UpdateDiscussionInput;
 };
@@ -3465,6 +3497,10 @@ export type MutationUpdateUserPlatformSettingsArgs = {
 
 export type MutationUpdateVirtualContributorArgs = {
   virtualContributorData: UpdateVirtualContributorInput;
+};
+
+export type MutationUpdateVirtualContributorPlatformSettingsArgs = {
+  updateData: UpdateVirtualContributorPlatformSettingsInput;
 };
 
 export type MutationUpdateVirtualPersonaArgs = {
@@ -3740,6 +3776,8 @@ export type PlatformLocations = {
   security: Scalars['String'];
   /** URL where users can get support for the platform */
   support: Scalars['String'];
+  /** URL for the link Contact in the HomePage to switch between plans */
+  switchplan: Scalars['String'];
   /** URL to the terms of usage for the platform */
   terms: Scalars['String'];
   /** URL where users can get tips and tricks */
@@ -5044,6 +5082,19 @@ export type UpdateCommunityGuidelinesInput = {
   profile: UpdateProfileInput;
 };
 
+export type UpdateCommunityGuidelinesOfTemplateInput = {
+  /** The Profile for this community guidelines. */
+  profile: UpdateProfileInput;
+};
+
+export type UpdateCommunityGuidelinesTemplateInput = {
+  ID: Scalars['UUID'];
+  /** The Community guidelines to associate with this template. */
+  communityGuidelines?: InputMaybe<UpdateCommunityGuidelinesOfTemplateInput>;
+  /** The Profile of the Template. */
+  profile?: InputMaybe<UpdateProfileInput>;
+};
+
 export type UpdateContextInput = {
   impact?: InputMaybe<Scalars['Markdown']>;
   vision?: InputMaybe<Scalars['Markdown']>;
@@ -5382,6 +5433,12 @@ export type UpdateVirtualContributorInput = {
   profileData?: InputMaybe<UpdateProfileInput>;
 };
 
+export type UpdateVirtualContributorPlatformSettingsInput = {
+  ID: Scalars['UUID'];
+  /** An Account ID associated with the VirtualContributor */
+  accountID: Scalars['UUID'];
+};
+
 export type UpdateVirtualPersonaInput = {
   ID: Scalars['UUID'];
   engine: VirtualContributorEngine;
@@ -5564,9 +5621,9 @@ export type VirtualContributor = Contributor & {
   /** The authorization rules for the Contributor */
   authorization?: Maybe<Authorization>;
   /** The body of knowledge ID used for the Virtual Contributor */
-  bodyOfKnowledgeID: Scalars['UUID'];
+  bodyOfKnowledgeID?: Maybe<Scalars['UUID']>;
   /** The body of knowledge type used for the Virtual Contributor */
-  bodyOfKnowledgeType: BodyOfKnowledgeType;
+  bodyOfKnowledgeType?: Maybe<BodyOfKnowledgeType>;
   /** The ID of the Contributor */
   id: Scalars['UUID'];
   /** A name identifier of the Contributor, unique within a given scope. */
@@ -5981,6 +6038,7 @@ export type ResolversTypes = {
   DeleteCalloutInput: DeleteCalloutInput;
   DeleteCalloutTemplateInput: DeleteCalloutTemplateInput;
   DeleteCollaborationInput: DeleteCollaborationInput;
+  DeleteCommunityGuidelinesTemplateInput: DeleteCommunityGuidelinesTemplateInput;
   DeleteDiscussionInput: DeleteDiscussionInput;
   DeleteDocumentInput: DeleteDocumentInput;
   DeleteInnovationFlowTemplateInput: DeleteInnovationFlowTemplateInput;
@@ -6022,6 +6080,7 @@ export type ResolversTypes = {
   ISearchResults: ResolverTypeWrapper<ISearchResults>;
   IngestBatchResult: ResolverTypeWrapper<IngestBatchResult>;
   IngestResult: ResolverTypeWrapper<IngestResult>;
+  IngestSpaceInput: IngestSpaceInput;
   InnovationFlow: ResolverTypeWrapper<InnovationFlow>;
   InnovationFlowState: ResolverTypeWrapper<InnovationFlowState>;
   InnovationFlowTemplate: ResolverTypeWrapper<InnovationFlowTemplate>;
@@ -6186,6 +6245,8 @@ export type ResolversTypes = {
   UpdateCollaborationCalloutsSortOrderInput: UpdateCollaborationCalloutsSortOrderInput;
   UpdateCommunityApplicationFormInput: UpdateCommunityApplicationFormInput;
   UpdateCommunityGuidelinesInput: UpdateCommunityGuidelinesInput;
+  UpdateCommunityGuidelinesOfTemplateInput: UpdateCommunityGuidelinesOfTemplateInput;
+  UpdateCommunityGuidelinesTemplateInput: UpdateCommunityGuidelinesTemplateInput;
   UpdateContextInput: UpdateContextInput;
   UpdateDiscussionInput: UpdateDiscussionInput;
   UpdateDocumentInput: UpdateDocumentInput;
@@ -6227,6 +6288,7 @@ export type ResolversTypes = {
   UpdateUserPlatformSettingsInput: UpdateUserPlatformSettingsInput;
   UpdateUserPreferenceInput: UpdateUserPreferenceInput;
   UpdateVirtualContributorInput: UpdateVirtualContributorInput;
+  UpdateVirtualContributorPlatformSettingsInput: UpdateVirtualContributorPlatformSettingsInput;
   UpdateVirtualPersonaInput: UpdateVirtualPersonaInput;
   UpdateVisualInput: UpdateVisualInput;
   UpdateWhiteboardContentInput: UpdateWhiteboardContentInput;
@@ -6421,6 +6483,7 @@ export type ResolversParentTypes = {
   DeleteCalloutInput: DeleteCalloutInput;
   DeleteCalloutTemplateInput: DeleteCalloutTemplateInput;
   DeleteCollaborationInput: DeleteCollaborationInput;
+  DeleteCommunityGuidelinesTemplateInput: DeleteCommunityGuidelinesTemplateInput;
   DeleteDiscussionInput: DeleteDiscussionInput;
   DeleteDocumentInput: DeleteDocumentInput;
   DeleteInnovationFlowTemplateInput: DeleteInnovationFlowTemplateInput;
@@ -6462,6 +6525,7 @@ export type ResolversParentTypes = {
   ISearchResults: ISearchResults;
   IngestBatchResult: IngestBatchResult;
   IngestResult: IngestResult;
+  IngestSpaceInput: IngestSpaceInput;
   InnovationFlow: InnovationFlow;
   InnovationFlowState: InnovationFlowState;
   InnovationFlowTemplate: InnovationFlowTemplate;
@@ -6604,6 +6668,8 @@ export type ResolversParentTypes = {
   UpdateCollaborationCalloutsSortOrderInput: UpdateCollaborationCalloutsSortOrderInput;
   UpdateCommunityApplicationFormInput: UpdateCommunityApplicationFormInput;
   UpdateCommunityGuidelinesInput: UpdateCommunityGuidelinesInput;
+  UpdateCommunityGuidelinesOfTemplateInput: UpdateCommunityGuidelinesOfTemplateInput;
+  UpdateCommunityGuidelinesTemplateInput: UpdateCommunityGuidelinesTemplateInput;
   UpdateContextInput: UpdateContextInput;
   UpdateDiscussionInput: UpdateDiscussionInput;
   UpdateDocumentInput: UpdateDocumentInput;
@@ -6645,6 +6711,7 @@ export type ResolversParentTypes = {
   UpdateUserPlatformSettingsInput: UpdateUserPlatformSettingsInput;
   UpdateUserPreferenceInput: UpdateUserPreferenceInput;
   UpdateVirtualContributorInput: UpdateVirtualContributorInput;
+  UpdateVirtualContributorPlatformSettingsInput: UpdateVirtualContributorPlatformSettingsInput;
   UpdateVirtualPersonaInput: UpdateVirtualPersonaInput;
   UpdateVisualInput: UpdateVisualInput;
   UpdateWhiteboardContentInput: UpdateWhiteboardContentInput;
@@ -6715,6 +6782,11 @@ export type AccountResolvers<
   spaceID?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   subscriptions?: Resolver<
     Array<ResolversTypes['AccountSubscription']>,
+    ParentType,
+    ContextType
+  >;
+  virtualContributors?: Resolver<
+    Array<ResolversTypes['VirtualContributor']>,
     ParentType,
     ContextType
   >;
@@ -9292,6 +9364,12 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationDeleteCollaborationArgs, 'deleteData'>
   >;
+  deleteCommunityGuidelinesTemplate?: Resolver<
+    ResolversTypes['CommunityGuidelinesTemplate'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationDeleteCommunityGuidelinesTemplateArgs, 'deleteData'>
+  >;
   deleteDiscussion?: Resolver<
     ResolversTypes['Discussion'],
     ParentType,
@@ -9467,6 +9545,12 @@ export type MutationResolvers<
     RequireFields<MutationGrantCredentialToUserArgs, 'grantCredentialData'>
   >;
   ingest?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  ingestSpace?: Resolver<
+    ResolversTypes['Space'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationIngestSpaceArgs, 'ingestSpaceData'>
+  >;
   inviteExistingUserForCommunityMembership?: Resolver<
     Array<ResolversTypes['Invitation']>,
     ParentType,
@@ -9673,6 +9757,15 @@ export type MutationResolvers<
       'communityGuidelinesData'
     >
   >;
+  updateCommunityGuidelinesTemplate?: Resolver<
+    ResolversTypes['CommunityGuidelinesTemplate'],
+    ParentType,
+    ContextType,
+    RequireFields<
+      MutationUpdateCommunityGuidelinesTemplateArgs,
+      'communityGuidelinesTemplateInput'
+    >
+  >;
   updateDiscussion?: Resolver<
     ResolversTypes['Discussion'],
     ParentType,
@@ -9860,6 +9953,15 @@ export type MutationResolvers<
     RequireFields<
       MutationUpdateVirtualContributorArgs,
       'virtualContributorData'
+    >
+  >;
+  updateVirtualContributorPlatformSettings?: Resolver<
+    ResolversTypes['VirtualContributor'],
+    ParentType,
+    ContextType,
+    RequireFields<
+      MutationUpdateVirtualContributorPlatformSettingsArgs,
+      'updateData'
     >
   >;
   updateVirtualPersona?: Resolver<
@@ -10202,6 +10304,7 @@ export type PlatformLocationsResolvers<
   releases?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   security?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   support?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  switchplan?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   terms?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   tips?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -11555,9 +11658,13 @@ export type VirtualContributorResolvers<
     ParentType,
     ContextType
   >;
-  bodyOfKnowledgeID?: Resolver<ResolversTypes['UUID'], ParentType, ContextType>;
+  bodyOfKnowledgeID?: Resolver<
+    Maybe<ResolversTypes['UUID']>,
+    ParentType,
+    ContextType
+  >;
   bodyOfKnowledgeType?: Resolver<
-    ResolversTypes['BodyOfKnowledgeType'],
+    Maybe<ResolversTypes['BodyOfKnowledgeType']>,
     ParentType,
     ContextType
   >;
@@ -11904,6 +12011,90 @@ export type SpaceDetailsFragment = {
   };
   community: { id: string };
   context: { id: string };
+};
+
+export type SpaceIngestFragment = {
+  id: string;
+  nameID: string;
+  type: SpaceType;
+  profile: {
+    description?: any | undefined;
+    displayName: string;
+    tagline: string;
+    url: string;
+    location?:
+      | { city: string; country: string; postalCode: string }
+      | undefined;
+    tagset?: { tags: Array<string> } | undefined;
+    references?:
+      | Array<{ description?: string | undefined; name: string; uri: string }>
+      | undefined;
+    visuals: Array<{ uri: string; name: string }>;
+  };
+  context: {
+    vision?: any | undefined;
+    impact?: any | undefined;
+    who?: any | undefined;
+  };
+  collaboration: {
+    callouts: Array<{
+      id: string;
+      nameID: string;
+      type: CalloutType;
+      comments?:
+        | {
+            messagesCount: number;
+            messages: Array<{
+              message: any;
+              timestamp: number;
+              sender?:
+                | { profile: { url: string; displayName: string } }
+                | { profile: { url: string; displayName: string } }
+                | {}
+                | undefined;
+            }>;
+          }
+        | undefined;
+      framing: {
+        profile: {
+          description?: any | undefined;
+          displayName: string;
+          tagline: string;
+          url: string;
+          tagset?: { tags: Array<string> } | undefined;
+          references?:
+            | Array<{
+                description?: string | undefined;
+                name: string;
+                uri: string;
+              }>
+            | undefined;
+          visuals: Array<{ uri: string; name: string }>;
+        };
+      };
+      contributions: Array<{
+        link?:
+          | {
+              uri: string;
+              profile: {
+                description?: any | undefined;
+                displayName: string;
+                url: string;
+                type?: ProfileType | undefined;
+                references?:
+                  | Array<{
+                      description?: string | undefined;
+                      name: string;
+                      uri: string;
+                    }>
+                  | undefined;
+                visuals: Array<{ uri: string; name: string }>;
+              };
+            }
+          | undefined;
+      }>;
+    }>;
+  };
 };
 
 export type UserDetailsFragment = {
@@ -12406,33 +12597,97 @@ export type SpaceIngestQuery = {
           id: string;
           nameID: string;
           type: SpaceType;
-          profile: {
-            description?: any | undefined;
-            displayName: string;
-            tagline: string;
-            url: string;
-            location?:
-              | { city: string; country: string; postalCode: string }
-              | undefined;
-            tagset?: { tags: Array<string> } | undefined;
-            references?:
-              | Array<{
-                  description?: string | undefined;
-                  name: string;
-                  uri: string;
-                }>
-              | undefined;
-            visuals: Array<{ uri: string; name: string }>;
-          };
-          context: {
-            vision?: any | undefined;
-            impact?: any | undefined;
-            who?: any | undefined;
-          };
           subspaces: Array<{
             id: string;
             nameID: string;
             type: SpaceType;
+            subspaces: Array<{
+              id: string;
+              nameID: string;
+              type: SpaceType;
+              profile: {
+                description?: any | undefined;
+                displayName: string;
+                tagline: string;
+                url: string;
+                location?:
+                  | { city: string; country: string; postalCode: string }
+                  | undefined;
+                tagset?: { tags: Array<string> } | undefined;
+                references?:
+                  | Array<{
+                      description?: string | undefined;
+                      name: string;
+                      uri: string;
+                    }>
+                  | undefined;
+                visuals: Array<{ uri: string; name: string }>;
+              };
+              context: {
+                vision?: any | undefined;
+                impact?: any | undefined;
+                who?: any | undefined;
+              };
+              collaboration: {
+                callouts: Array<{
+                  id: string;
+                  nameID: string;
+                  type: CalloutType;
+                  comments?:
+                    | {
+                        messagesCount: number;
+                        messages: Array<{
+                          message: any;
+                          timestamp: number;
+                          sender?:
+                            | { profile: { url: string; displayName: string } }
+                            | { profile: { url: string; displayName: string } }
+                            | {}
+                            | undefined;
+                        }>;
+                      }
+                    | undefined;
+                  framing: {
+                    profile: {
+                      description?: any | undefined;
+                      displayName: string;
+                      tagline: string;
+                      url: string;
+                      tagset?: { tags: Array<string> } | undefined;
+                      references?:
+                        | Array<{
+                            description?: string | undefined;
+                            name: string;
+                            uri: string;
+                          }>
+                        | undefined;
+                      visuals: Array<{ uri: string; name: string }>;
+                    };
+                  };
+                  contributions: Array<{
+                    link?:
+                      | {
+                          uri: string;
+                          profile: {
+                            description?: any | undefined;
+                            displayName: string;
+                            url: string;
+                            type?: ProfileType | undefined;
+                            references?:
+                              | Array<{
+                                  description?: string | undefined;
+                                  name: string;
+                                  uri: string;
+                                }>
+                              | undefined;
+                            visuals: Array<{ uri: string; name: string }>;
+                          };
+                        }
+                      | undefined;
+                  }>;
+                }>;
+              };
+            }>;
             profile: {
               description?: any | undefined;
               displayName: string;
@@ -12516,6 +12771,88 @@ export type SpaceIngestQuery = {
               }>;
             };
           }>;
+          profile: {
+            description?: any | undefined;
+            displayName: string;
+            tagline: string;
+            url: string;
+            location?:
+              | { city: string; country: string; postalCode: string }
+              | undefined;
+            tagset?: { tags: Array<string> } | undefined;
+            references?:
+              | Array<{
+                  description?: string | undefined;
+                  name: string;
+                  uri: string;
+                }>
+              | undefined;
+            visuals: Array<{ uri: string; name: string }>;
+          };
+          context: {
+            vision?: any | undefined;
+            impact?: any | undefined;
+            who?: any | undefined;
+          };
+          collaboration: {
+            callouts: Array<{
+              id: string;
+              nameID: string;
+              type: CalloutType;
+              comments?:
+                | {
+                    messagesCount: number;
+                    messages: Array<{
+                      message: any;
+                      timestamp: number;
+                      sender?:
+                        | { profile: { url: string; displayName: string } }
+                        | { profile: { url: string; displayName: string } }
+                        | {}
+                        | undefined;
+                    }>;
+                  }
+                | undefined;
+              framing: {
+                profile: {
+                  description?: any | undefined;
+                  displayName: string;
+                  tagline: string;
+                  url: string;
+                  tagset?: { tags: Array<string> } | undefined;
+                  references?:
+                    | Array<{
+                        description?: string | undefined;
+                        name: string;
+                        uri: string;
+                      }>
+                    | undefined;
+                  visuals: Array<{ uri: string; name: string }>;
+                };
+              };
+              contributions: Array<{
+                link?:
+                  | {
+                      uri: string;
+                      profile: {
+                        description?: any | undefined;
+                        displayName: string;
+                        url: string;
+                        type?: ProfileType | undefined;
+                        references?:
+                          | Array<{
+                              description?: string | undefined;
+                              name: string;
+                              uri: string;
+                            }>
+                          | undefined;
+                        visuals: Array<{ uri: string; name: string }>;
+                      };
+                    }
+                  | undefined;
+              }>;
+            }>;
+          };
         }
       | undefined;
   };

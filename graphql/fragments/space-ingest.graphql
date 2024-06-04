@@ -1,0 +1,102 @@
+fragment SpaceIngest on Space {
+  id
+  nameID
+  type
+  profile {
+    description
+    displayName
+    tagline
+    url
+    location {
+      city
+      country
+      postalCode
+    }
+    tagset {
+      tags
+    }
+    references {
+      description
+      name
+      uri
+    }
+    visuals {
+      uri
+      name
+    }
+  }
+  context {
+    vision
+    impact
+    who
+  }
+
+  collaboration {
+    callouts {
+      id
+      nameID
+      type
+      comments {
+        messagesCount
+        messages {
+          sender {
+            ... on User {
+              profile {
+                url
+                displayName
+              }
+            }
+            ... on VirtualContributor {
+              profile {
+                url
+                displayName
+              }
+            }
+          }
+          message
+          timestamp
+        }
+      }
+      framing {
+        profile {
+          description
+          displayName
+          tagline
+          url
+          tagset {
+            tags
+          }
+          references {
+            description
+            name
+            uri
+          }
+          visuals {
+            uri
+            name
+          }
+        }
+      }
+      contributions {
+        link {
+          uri
+          profile {
+            description
+            displayName
+            url
+            type
+            references {
+              description
+              name
+              uri
+            }
+            visuals {
+              uri
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}

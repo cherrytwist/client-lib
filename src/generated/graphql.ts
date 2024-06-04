@@ -76,6 +76,8 @@ export type Account = {
   spaceID: Scalars['String'];
   /** The subscriptions active for this Account. */
   subscriptions: Array<AccountSubscription>;
+  /** The virtual contributors for this Account. */
+  virtualContributors: Array<VirtualContributor>;
 };
 
 export type AccountAuthorizationResetInput = {
@@ -754,6 +756,7 @@ export enum AuthorizationPrivilege {
 }
 
 export enum BodyOfKnowledgeType {
+  Other = 'OTHER',
   Space = 'SPACE',
 }
 
@@ -1705,8 +1708,8 @@ export type CreateUserInput = {
 
 export type CreateVirtualContributorOnAccountInput = {
   accountID: Scalars['UUID'];
-  bodyOfKnowledgeID: Scalars['UUID'];
-  bodyOfKnowledgeType: BodyOfKnowledgeType;
+  bodyOfKnowledgeID?: InputMaybe<Scalars['UUID']>;
+  bodyOfKnowledgeType?: InputMaybe<BodyOfKnowledgeType>;
   /** A readable identifier, unique within the containing scope. */
   nameID: Scalars['NameID'];
   profileData: CreateProfileInput;
@@ -1822,6 +1825,10 @@ export type DeleteCalloutTemplateInput = {
 };
 
 export type DeleteCollaborationInput = {
+  ID: Scalars['UUID'];
+};
+
+export type DeleteCommunityGuidelinesTemplateInput = {
   ID: Scalars['UUID'];
 };
 
@@ -2088,6 +2095,11 @@ export type IngestResult = {
   index: Scalars['String'];
   /** Amount of documents indexed. */
   total?: Maybe<Scalars['Float']>;
+};
+
+export type IngestSpaceInput = {
+  /** The identifier for the Space to be ingested. */
+  spaceID: Scalars['UUID'];
 };
 
 export type InnovationFlow = {
@@ -2721,6 +2733,8 @@ export type Mutation = {
   deleteCalloutTemplate: CalloutTemplate;
   /** Delete Collaboration. */
   deleteCollaboration: Collaboration;
+  /** Deletes the specified CommunityGuidelines Template. */
+  deleteCommunityGuidelinesTemplate: CommunityGuidelinesTemplate;
   /** Deletes the specified Discussion. */
   deleteDiscussion: Discussion;
   /** Deletes the specified Document. */
@@ -2779,6 +2793,8 @@ export type Mutation = {
   grantCredentialToUser: User;
   /** Resets the interaction with the chat engine. */
   ingest: Scalars['Boolean'];
+  /** Triggers space ingestion. */
+  ingestSpace: Space;
   /** Invite an existing User to join the specified Community as a member. */
   inviteExistingUserForCommunityMembership: Array<Invitation>;
   /** Invite an external User to join the specified Community as a member. */
@@ -2843,6 +2859,8 @@ export type Mutation = {
   updateCommunityApplicationForm: Community;
   /** Updates the CommunityGuidelines. */
   updateCommunityGuidelines: CommunityGuidelines;
+  /** Updates the specified CommunityGuidelinesTemplate. */
+  updateCommunityGuidelinesTemplate: CommunityGuidelinesTemplate;
   /** Updates the specified Discussion. */
   updateDiscussion: Discussion;
   /** Updates the specified Document. */
@@ -2901,6 +2919,8 @@ export type Mutation = {
   updateUserPlatformSettings: User;
   /** Updates the specified VirtualContributor. */
   updateVirtualContributor: VirtualContributor;
+  /** Update VirtualContributor Platform Settings. */
+  updateVirtualContributorPlatformSettings: VirtualContributor;
   /** Updates the specified VirtualPersona. */
   updateVirtualPersona: VirtualPersona;
   /** Updates the image URI for the specified Visual. */
@@ -3122,6 +3142,10 @@ export type MutationDeleteCollaborationArgs = {
   deleteData: DeleteCollaborationInput;
 };
 
+export type MutationDeleteCommunityGuidelinesTemplateArgs = {
+  deleteData: DeleteCommunityGuidelinesTemplateInput;
+};
+
 export type MutationDeleteDiscussionArgs = {
   deleteData: DeleteDiscussionInput;
 };
@@ -3232,6 +3256,10 @@ export type MutationGrantCredentialToOrganizationArgs = {
 
 export type MutationGrantCredentialToUserArgs = {
   grantCredentialData: GrantAuthorizationCredentialInput;
+};
+
+export type MutationIngestSpaceArgs = {
+  ingestSpaceData: IngestSpaceInput;
 };
 
 export type MutationInviteExistingUserForCommunityMembershipArgs = {
@@ -3358,6 +3386,10 @@ export type MutationUpdateCommunityGuidelinesArgs = {
   communityGuidelinesData: UpdateCommunityGuidelinesInput;
 };
 
+export type MutationUpdateCommunityGuidelinesTemplateArgs = {
+  communityGuidelinesTemplateInput: UpdateCommunityGuidelinesTemplateInput;
+};
+
 export type MutationUpdateDiscussionArgs = {
   updateData: UpdateDiscussionInput;
 };
@@ -3472,6 +3504,10 @@ export type MutationUpdateUserPlatformSettingsArgs = {
 
 export type MutationUpdateVirtualContributorArgs = {
   virtualContributorData: UpdateVirtualContributorInput;
+};
+
+export type MutationUpdateVirtualContributorPlatformSettingsArgs = {
+  updateData: UpdateVirtualContributorPlatformSettingsInput;
 };
 
 export type MutationUpdateVirtualPersonaArgs = {
@@ -3747,6 +3783,8 @@ export type PlatformLocations = {
   security: Scalars['String'];
   /** URL where users can get support for the platform */
   support: Scalars['String'];
+  /** URL for the link Contact in the HomePage to switch between plans */
+  switchplan: Scalars['String'];
   /** URL to the terms of usage for the platform */
   terms: Scalars['String'];
   /** URL where users can get tips and tricks */
@@ -5051,6 +5089,19 @@ export type UpdateCommunityGuidelinesInput = {
   profile: UpdateProfileInput;
 };
 
+export type UpdateCommunityGuidelinesOfTemplateInput = {
+  /** The Profile for this community guidelines. */
+  profile: UpdateProfileInput;
+};
+
+export type UpdateCommunityGuidelinesTemplateInput = {
+  ID: Scalars['UUID'];
+  /** The Community guidelines to associate with this template. */
+  communityGuidelines?: InputMaybe<UpdateCommunityGuidelinesOfTemplateInput>;
+  /** The Profile of the Template. */
+  profile?: InputMaybe<UpdateProfileInput>;
+};
+
 export type UpdateContextInput = {
   impact?: InputMaybe<Scalars['Markdown']>;
   vision?: InputMaybe<Scalars['Markdown']>;
@@ -5389,6 +5440,12 @@ export type UpdateVirtualContributorInput = {
   profileData?: InputMaybe<UpdateProfileInput>;
 };
 
+export type UpdateVirtualContributorPlatformSettingsInput = {
+  ID: Scalars['UUID'];
+  /** An Account ID associated with the VirtualContributor */
+  accountID: Scalars['UUID'];
+};
+
 export type UpdateVirtualPersonaInput = {
   ID: Scalars['UUID'];
   engine: VirtualContributorEngine;
@@ -5571,9 +5628,9 @@ export type VirtualContributor = Contributor & {
   /** The authorization rules for the Contributor */
   authorization?: Maybe<Authorization>;
   /** The body of knowledge ID used for the Virtual Contributor */
-  bodyOfKnowledgeID: Scalars['UUID'];
+  bodyOfKnowledgeID?: Maybe<Scalars['UUID']>;
   /** The body of knowledge type used for the Virtual Contributor */
-  bodyOfKnowledgeType: BodyOfKnowledgeType;
+  bodyOfKnowledgeType?: Maybe<BodyOfKnowledgeType>;
   /** The ID of the Contributor */
   id: Scalars['UUID'];
   /** A name identifier of the Contributor, unique within a given scope. */
@@ -5988,6 +6045,7 @@ export type ResolversTypes = {
   DeleteCalloutInput: SchemaTypes.DeleteCalloutInput;
   DeleteCalloutTemplateInput: SchemaTypes.DeleteCalloutTemplateInput;
   DeleteCollaborationInput: SchemaTypes.DeleteCollaborationInput;
+  DeleteCommunityGuidelinesTemplateInput: SchemaTypes.DeleteCommunityGuidelinesTemplateInput;
   DeleteDiscussionInput: SchemaTypes.DeleteDiscussionInput;
   DeleteDocumentInput: SchemaTypes.DeleteDocumentInput;
   DeleteInnovationFlowTemplateInput: SchemaTypes.DeleteInnovationFlowTemplateInput;
@@ -6029,6 +6087,7 @@ export type ResolversTypes = {
   ISearchResults: ResolverTypeWrapper<SchemaTypes.ISearchResults>;
   IngestBatchResult: ResolverTypeWrapper<SchemaTypes.IngestBatchResult>;
   IngestResult: ResolverTypeWrapper<SchemaTypes.IngestResult>;
+  IngestSpaceInput: SchemaTypes.IngestSpaceInput;
   InnovationFlow: ResolverTypeWrapper<SchemaTypes.InnovationFlow>;
   InnovationFlowState: ResolverTypeWrapper<SchemaTypes.InnovationFlowState>;
   InnovationFlowTemplate: ResolverTypeWrapper<SchemaTypes.InnovationFlowTemplate>;
@@ -6197,6 +6256,8 @@ export type ResolversTypes = {
   UpdateCollaborationCalloutsSortOrderInput: SchemaTypes.UpdateCollaborationCalloutsSortOrderInput;
   UpdateCommunityApplicationFormInput: SchemaTypes.UpdateCommunityApplicationFormInput;
   UpdateCommunityGuidelinesInput: SchemaTypes.UpdateCommunityGuidelinesInput;
+  UpdateCommunityGuidelinesOfTemplateInput: SchemaTypes.UpdateCommunityGuidelinesOfTemplateInput;
+  UpdateCommunityGuidelinesTemplateInput: SchemaTypes.UpdateCommunityGuidelinesTemplateInput;
   UpdateContextInput: SchemaTypes.UpdateContextInput;
   UpdateDiscussionInput: SchemaTypes.UpdateDiscussionInput;
   UpdateDocumentInput: SchemaTypes.UpdateDocumentInput;
@@ -6238,6 +6299,7 @@ export type ResolversTypes = {
   UpdateUserPlatformSettingsInput: SchemaTypes.UpdateUserPlatformSettingsInput;
   UpdateUserPreferenceInput: SchemaTypes.UpdateUserPreferenceInput;
   UpdateVirtualContributorInput: SchemaTypes.UpdateVirtualContributorInput;
+  UpdateVirtualContributorPlatformSettingsInput: SchemaTypes.UpdateVirtualContributorPlatformSettingsInput;
   UpdateVirtualPersonaInput: SchemaTypes.UpdateVirtualPersonaInput;
   UpdateVisualInput: SchemaTypes.UpdateVisualInput;
   UpdateWhiteboardContentInput: SchemaTypes.UpdateWhiteboardContentInput;
@@ -6435,6 +6497,7 @@ export type ResolversParentTypes = {
   DeleteCalloutInput: SchemaTypes.DeleteCalloutInput;
   DeleteCalloutTemplateInput: SchemaTypes.DeleteCalloutTemplateInput;
   DeleteCollaborationInput: SchemaTypes.DeleteCollaborationInput;
+  DeleteCommunityGuidelinesTemplateInput: SchemaTypes.DeleteCommunityGuidelinesTemplateInput;
   DeleteDiscussionInput: SchemaTypes.DeleteDiscussionInput;
   DeleteDocumentInput: SchemaTypes.DeleteDocumentInput;
   DeleteInnovationFlowTemplateInput: SchemaTypes.DeleteInnovationFlowTemplateInput;
@@ -6476,6 +6539,7 @@ export type ResolversParentTypes = {
   ISearchResults: SchemaTypes.ISearchResults;
   IngestBatchResult: SchemaTypes.IngestBatchResult;
   IngestResult: SchemaTypes.IngestResult;
+  IngestSpaceInput: SchemaTypes.IngestSpaceInput;
   InnovationFlow: SchemaTypes.InnovationFlow;
   InnovationFlowState: SchemaTypes.InnovationFlowState;
   InnovationFlowTemplate: SchemaTypes.InnovationFlowTemplate;
@@ -6618,6 +6682,8 @@ export type ResolversParentTypes = {
   UpdateCollaborationCalloutsSortOrderInput: SchemaTypes.UpdateCollaborationCalloutsSortOrderInput;
   UpdateCommunityApplicationFormInput: SchemaTypes.UpdateCommunityApplicationFormInput;
   UpdateCommunityGuidelinesInput: SchemaTypes.UpdateCommunityGuidelinesInput;
+  UpdateCommunityGuidelinesOfTemplateInput: SchemaTypes.UpdateCommunityGuidelinesOfTemplateInput;
+  UpdateCommunityGuidelinesTemplateInput: SchemaTypes.UpdateCommunityGuidelinesTemplateInput;
   UpdateContextInput: SchemaTypes.UpdateContextInput;
   UpdateDiscussionInput: SchemaTypes.UpdateDiscussionInput;
   UpdateDocumentInput: SchemaTypes.UpdateDocumentInput;
@@ -6659,6 +6725,7 @@ export type ResolversParentTypes = {
   UpdateUserPlatformSettingsInput: SchemaTypes.UpdateUserPlatformSettingsInput;
   UpdateUserPreferenceInput: SchemaTypes.UpdateUserPreferenceInput;
   UpdateVirtualContributorInput: SchemaTypes.UpdateVirtualContributorInput;
+  UpdateVirtualContributorPlatformSettingsInput: SchemaTypes.UpdateVirtualContributorPlatformSettingsInput;
   UpdateVirtualPersonaInput: SchemaTypes.UpdateVirtualPersonaInput;
   UpdateVisualInput: SchemaTypes.UpdateVisualInput;
   UpdateWhiteboardContentInput: SchemaTypes.UpdateWhiteboardContentInput;
@@ -6729,6 +6796,11 @@ export type AccountResolvers<
   spaceID?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   subscriptions?: Resolver<
     Array<ResolversTypes['AccountSubscription']>,
+    ParentType,
+    ContextType
+  >;
+  virtualContributors?: Resolver<
+    Array<ResolversTypes['VirtualContributor']>,
     ParentType,
     ContextType
   >;
@@ -9528,6 +9600,15 @@ export type MutationResolvers<
     ContextType,
     RequireFields<SchemaTypes.MutationDeleteCollaborationArgs, 'deleteData'>
   >;
+  deleteCommunityGuidelinesTemplate?: Resolver<
+    ResolversTypes['CommunityGuidelinesTemplate'],
+    ParentType,
+    ContextType,
+    RequireFields<
+      SchemaTypes.MutationDeleteCommunityGuidelinesTemplateArgs,
+      'deleteData'
+    >
+  >;
   deleteDiscussion?: Resolver<
     ResolversTypes['Discussion'],
     ParentType,
@@ -9724,6 +9805,12 @@ export type MutationResolvers<
     >
   >;
   ingest?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  ingestSpace?: Resolver<
+    ResolversTypes['Space'],
+    ParentType,
+    ContextType,
+    RequireFields<SchemaTypes.MutationIngestSpaceArgs, 'ingestSpaceData'>
+  >;
   inviteExistingUserForCommunityMembership?: Resolver<
     Array<ResolversTypes['Invitation']>,
     ParentType,
@@ -9975,6 +10062,15 @@ export type MutationResolvers<
       'communityGuidelinesData'
     >
   >;
+  updateCommunityGuidelinesTemplate?: Resolver<
+    ResolversTypes['CommunityGuidelinesTemplate'],
+    ParentType,
+    ContextType,
+    RequireFields<
+      SchemaTypes.MutationUpdateCommunityGuidelinesTemplateArgs,
+      'communityGuidelinesTemplateInput'
+    >
+  >;
   updateDiscussion?: Resolver<
     ResolversTypes['Discussion'],
     ParentType,
@@ -10195,6 +10291,15 @@ export type MutationResolvers<
     RequireFields<
       SchemaTypes.MutationUpdateVirtualContributorArgs,
       'virtualContributorData'
+    >
+  >;
+  updateVirtualContributorPlatformSettings?: Resolver<
+    ResolversTypes['VirtualContributor'],
+    ParentType,
+    ContextType,
+    RequireFields<
+      SchemaTypes.MutationUpdateVirtualContributorPlatformSettingsArgs,
+      'updateData'
     >
   >;
   updateVirtualPersona?: Resolver<
@@ -10563,6 +10668,7 @@ export type PlatformLocationsResolvers<
   releases?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   security?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   support?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  switchplan?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   terms?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   tips?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -11969,9 +12075,13 @@ export type VirtualContributorResolvers<
     ParentType,
     ContextType
   >;
-  bodyOfKnowledgeID?: Resolver<ResolversTypes['UUID'], ParentType, ContextType>;
+  bodyOfKnowledgeID?: Resolver<
+    SchemaTypes.Maybe<ResolversTypes['UUID']>,
+    ParentType,
+    ContextType
+  >;
   bodyOfKnowledgeType?: Resolver<
-    ResolversTypes['BodyOfKnowledgeType'],
+    SchemaTypes.Maybe<ResolversTypes['BodyOfKnowledgeType']>,
     ParentType,
     ContextType
   >;
@@ -12326,6 +12436,90 @@ export type SpaceDetailsFragment = {
   };
   community: { id: string };
   context: { id: string };
+};
+
+export type SpaceIngestFragment = {
+  id: string;
+  nameID: string;
+  type: SchemaTypes.SpaceType;
+  profile: {
+    description?: any | undefined;
+    displayName: string;
+    tagline: string;
+    url: string;
+    location?:
+      | { city: string; country: string; postalCode: string }
+      | undefined;
+    tagset?: { tags: Array<string> } | undefined;
+    references?:
+      | Array<{ description?: string | undefined; name: string; uri: string }>
+      | undefined;
+    visuals: Array<{ uri: string; name: string }>;
+  };
+  context: {
+    vision?: any | undefined;
+    impact?: any | undefined;
+    who?: any | undefined;
+  };
+  collaboration: {
+    callouts: Array<{
+      id: string;
+      nameID: string;
+      type: SchemaTypes.CalloutType;
+      comments?:
+        | {
+            messagesCount: number;
+            messages: Array<{
+              message: any;
+              timestamp: number;
+              sender?:
+                | { profile: { url: string; displayName: string } }
+                | { profile: { url: string; displayName: string } }
+                | {}
+                | undefined;
+            }>;
+          }
+        | undefined;
+      framing: {
+        profile: {
+          description?: any | undefined;
+          displayName: string;
+          tagline: string;
+          url: string;
+          tagset?: { tags: Array<string> } | undefined;
+          references?:
+            | Array<{
+                description?: string | undefined;
+                name: string;
+                uri: string;
+              }>
+            | undefined;
+          visuals: Array<{ uri: string; name: string }>;
+        };
+      };
+      contributions: Array<{
+        link?:
+          | {
+              uri: string;
+              profile: {
+                description?: any | undefined;
+                displayName: string;
+                url: string;
+                type?: SchemaTypes.ProfileType | undefined;
+                references?:
+                  | Array<{
+                      description?: string | undefined;
+                      name: string;
+                      uri: string;
+                    }>
+                  | undefined;
+                visuals: Array<{ uri: string; name: string }>;
+              };
+            }
+          | undefined;
+      }>;
+    }>;
+  };
 };
 
 export type UserDetailsFragment = {
@@ -12853,33 +13047,97 @@ export type SpaceIngestQuery = {
           id: string;
           nameID: string;
           type: SchemaTypes.SpaceType;
-          profile: {
-            description?: any | undefined;
-            displayName: string;
-            tagline: string;
-            url: string;
-            location?:
-              | { city: string; country: string; postalCode: string }
-              | undefined;
-            tagset?: { tags: Array<string> } | undefined;
-            references?:
-              | Array<{
-                  description?: string | undefined;
-                  name: string;
-                  uri: string;
-                }>
-              | undefined;
-            visuals: Array<{ uri: string; name: string }>;
-          };
-          context: {
-            vision?: any | undefined;
-            impact?: any | undefined;
-            who?: any | undefined;
-          };
           subspaces: Array<{
             id: string;
             nameID: string;
             type: SchemaTypes.SpaceType;
+            subspaces: Array<{
+              id: string;
+              nameID: string;
+              type: SchemaTypes.SpaceType;
+              profile: {
+                description?: any | undefined;
+                displayName: string;
+                tagline: string;
+                url: string;
+                location?:
+                  | { city: string; country: string; postalCode: string }
+                  | undefined;
+                tagset?: { tags: Array<string> } | undefined;
+                references?:
+                  | Array<{
+                      description?: string | undefined;
+                      name: string;
+                      uri: string;
+                    }>
+                  | undefined;
+                visuals: Array<{ uri: string; name: string }>;
+              };
+              context: {
+                vision?: any | undefined;
+                impact?: any | undefined;
+                who?: any | undefined;
+              };
+              collaboration: {
+                callouts: Array<{
+                  id: string;
+                  nameID: string;
+                  type: SchemaTypes.CalloutType;
+                  comments?:
+                    | {
+                        messagesCount: number;
+                        messages: Array<{
+                          message: any;
+                          timestamp: number;
+                          sender?:
+                            | { profile: { url: string; displayName: string } }
+                            | { profile: { url: string; displayName: string } }
+                            | {}
+                            | undefined;
+                        }>;
+                      }
+                    | undefined;
+                  framing: {
+                    profile: {
+                      description?: any | undefined;
+                      displayName: string;
+                      tagline: string;
+                      url: string;
+                      tagset?: { tags: Array<string> } | undefined;
+                      references?:
+                        | Array<{
+                            description?: string | undefined;
+                            name: string;
+                            uri: string;
+                          }>
+                        | undefined;
+                      visuals: Array<{ uri: string; name: string }>;
+                    };
+                  };
+                  contributions: Array<{
+                    link?:
+                      | {
+                          uri: string;
+                          profile: {
+                            description?: any | undefined;
+                            displayName: string;
+                            url: string;
+                            type?: SchemaTypes.ProfileType | undefined;
+                            references?:
+                              | Array<{
+                                  description?: string | undefined;
+                                  name: string;
+                                  uri: string;
+                                }>
+                              | undefined;
+                            visuals: Array<{ uri: string; name: string }>;
+                          };
+                        }
+                      | undefined;
+                  }>;
+                }>;
+              };
+            }>;
             profile: {
               description?: any | undefined;
               displayName: string;
@@ -12963,6 +13221,88 @@ export type SpaceIngestQuery = {
               }>;
             };
           }>;
+          profile: {
+            description?: any | undefined;
+            displayName: string;
+            tagline: string;
+            url: string;
+            location?:
+              | { city: string; country: string; postalCode: string }
+              | undefined;
+            tagset?: { tags: Array<string> } | undefined;
+            references?:
+              | Array<{
+                  description?: string | undefined;
+                  name: string;
+                  uri: string;
+                }>
+              | undefined;
+            visuals: Array<{ uri: string; name: string }>;
+          };
+          context: {
+            vision?: any | undefined;
+            impact?: any | undefined;
+            who?: any | undefined;
+          };
+          collaboration: {
+            callouts: Array<{
+              id: string;
+              nameID: string;
+              type: SchemaTypes.CalloutType;
+              comments?:
+                | {
+                    messagesCount: number;
+                    messages: Array<{
+                      message: any;
+                      timestamp: number;
+                      sender?:
+                        | { profile: { url: string; displayName: string } }
+                        | { profile: { url: string; displayName: string } }
+                        | {}
+                        | undefined;
+                    }>;
+                  }
+                | undefined;
+              framing: {
+                profile: {
+                  description?: any | undefined;
+                  displayName: string;
+                  tagline: string;
+                  url: string;
+                  tagset?: { tags: Array<string> } | undefined;
+                  references?:
+                    | Array<{
+                        description?: string | undefined;
+                        name: string;
+                        uri: string;
+                      }>
+                    | undefined;
+                  visuals: Array<{ uri: string; name: string }>;
+                };
+              };
+              contributions: Array<{
+                link?:
+                  | {
+                      uri: string;
+                      profile: {
+                        description?: any | undefined;
+                        displayName: string;
+                        url: string;
+                        type?: SchemaTypes.ProfileType | undefined;
+                        references?:
+                          | Array<{
+                              description?: string | undefined;
+                              name: string;
+                              uri: string;
+                            }>
+                          | undefined;
+                        visuals: Array<{ uri: string; name: string }>;
+                      };
+                    }
+                  | undefined;
+              }>;
+            }>;
+          };
         }
       | undefined;
   };
@@ -13206,6 +13546,109 @@ export const SpaceDetailsFragmentDoc = gql`
     }
     context {
       id
+    }
+  }
+`;
+export const SpaceIngestFragmentDoc = gql`
+  fragment SpaceIngest on Space {
+    id
+    nameID
+    type
+    profile {
+      description
+      displayName
+      tagline
+      url
+      location {
+        city
+        country
+        postalCode
+      }
+      tagset {
+        tags
+      }
+      references {
+        description
+        name
+        uri
+      }
+      visuals {
+        uri
+        name
+      }
+    }
+    context {
+      vision
+      impact
+      who
+    }
+    collaboration {
+      callouts {
+        id
+        nameID
+        type
+        comments {
+          messagesCount
+          messages {
+            sender {
+              ... on User {
+                profile {
+                  url
+                  displayName
+                }
+              }
+              ... on VirtualContributor {
+                profile {
+                  url
+                  displayName
+                }
+              }
+            }
+            message
+            timestamp
+          }
+        }
+        framing {
+          profile {
+            description
+            displayName
+            tagline
+            url
+            tagset {
+              tags
+            }
+            references {
+              description
+              name
+              uri
+            }
+            visuals {
+              uri
+              name
+            }
+          }
+        }
+        contributions {
+          link {
+            uri
+            profile {
+              description
+              displayName
+              url
+              type
+              references {
+                description
+                name
+                uri
+              }
+              visuals {
+                uri
+                name
+              }
+            }
+          }
+        }
+      }
     }
   }
 `;
@@ -13709,141 +14152,17 @@ export const SpaceIngestDocument = gql`
   query spaceIngest($spaceID: UUID!) {
     lookup {
       space(ID: $spaceID) {
-        id
-        nameID
-        type
-        profile {
-          description
-          displayName
-          tagline
-          url
-          location {
-            city
-            country
-            postalCode
-          }
-          tagset {
-            tags
-          }
-          references {
-            description
-            name
-            uri
-          }
-          visuals {
-            uri
-            name
-          }
-        }
-        context {
-          vision
-          impact
-          who
-        }
+        ...SpaceIngest
         subspaces {
-          id
-          nameID
-          type
-          profile {
-            description
-            displayName
-            tagline
-            url
-            location {
-              city
-              country
-              postalCode
-            }
-            tagset {
-              tags
-            }
-            references {
-              description
-              name
-              uri
-            }
-            visuals {
-              uri
-              name
-            }
-          }
-          context {
-            vision
-            impact
-            who
-          }
-          collaboration {
-            callouts {
-              id
-              nameID
-              type
-              comments {
-                messagesCount
-                messages {
-                  sender {
-                    ... on User {
-                      profile {
-                        url
-                        displayName
-                      }
-                    }
-                    ... on VirtualContributor {
-                      profile {
-                        url
-                        displayName
-                      }
-                    }
-                  }
-                  message
-                  timestamp
-                }
-              }
-              framing {
-                profile {
-                  description
-                  displayName
-                  tagline
-                  url
-                  tagset {
-                    tags
-                  }
-                  references {
-                    description
-                    name
-                    uri
-                  }
-                  visuals {
-                    uri
-                    name
-                  }
-                }
-              }
-              contributions {
-                link {
-                  uri
-                  profile {
-                    description
-                    displayName
-                    url
-                    type
-                    references {
-                      description
-                      name
-                      uri
-                    }
-                    visuals {
-                      uri
-                      name
-                    }
-                  }
-                }
-              }
-            }
+          ...SpaceIngest
+          subspaces {
+            ...SpaceIngest
           }
         }
       }
     }
   }
+  ${SpaceIngestFragmentDoc}
 `;
 export const SpaceDocument = gql`
   query space($id: UUID_NAMEID!) {
