@@ -4694,8 +4694,8 @@ export type SpaceFilterInput = {
 };
 
 export enum SpaceIngestionPurpose {
-  Context = 'Context',
-  Knowledge = 'Knowledge',
+  Context = 'CONTEXT',
+  Knowledge = 'KNOWLEDGE',
 }
 
 export enum SpacePrivacyMode {
