@@ -522,11 +522,6 @@ export type ActorGroup = {
   name: Scalars['String'];
 };
 
-export type AdminSearchIngestResult = {
-  /** The result of the operation. */
-  results: Array<IngestResult>;
-};
-
 export type Agent = {
   /** The authorization rules for the entity */
   authorization?: Maybe<Authorization>;
@@ -719,6 +714,7 @@ export enum AuthorizationPrivilege {
   AccessVirtualContributor = 'ACCESS_VIRTUAL_CONTRIBUTOR',
   AuthorizationReset = 'AUTHORIZATION_RESET',
   CommunityAddMember = 'COMMUNITY_ADD_MEMBER',
+  CommunityAddMemberVcFromAccount = 'COMMUNITY_ADD_MEMBER_VC_FROM_ACCOUNT',
   CommunityApply = 'COMMUNITY_APPLY',
   CommunityInvite = 'COMMUNITY_INVITE',
   CommunityInviteAccept = 'COMMUNITY_INVITE_ACCEPT',
@@ -2067,6 +2063,8 @@ export type Groupable = {
 export type ISearchResults = {
   /** The search results for Callouts. */
   calloutResults: Array<SearchResult>;
+  /** The total number of results for Callouts. */
+  calloutResultsCount: Scalars['Float'];
   /** The search results for contributions (Posts, Whiteboards etc). */
   contributionResults: Array<SearchResult>;
   /** The total number of search results for contributions (Posts, Whiteboards etc). */
@@ -2077,29 +2075,15 @@ export type ISearchResults = {
   contributorResultsCount: Scalars['Float'];
   /** The search results for Groups. */
   groupResults: Array<SearchResult>;
-  /** The search results for Spaces / Challenges / Opportunities. */
+  /** The search results for Spaces / Subspaces. */
   journeyResults: Array<SearchResult>;
-  /** The total number of results for Spaces / Challenges / Opportunities. */
+  /** The total number of results for Spaces / Subspaces. */
   journeyResultsCount: Scalars['Float'];
 };
 
-export type IngestBatchResult = {
-  /** A message to describe the result of the operation. */
-  message?: Maybe<Scalars['String']>;
-  /** Whether the operation was successful. */
-  success: Scalars['Boolean'];
-};
-
-export type IngestResult = {
-  /** The result of the operation. */
-  batches: Array<IngestBatchResult>;
-  /** The index that the documents were ingested into. */
-  index: Scalars['String'];
-  /** Amount of documents indexed. */
-  total?: Maybe<Scalars['Float']>;
-};
-
 export type IngestSpaceInput = {
+  /** The purpose of the ingestions - either knowledge or context. */
+  purpose: SpaceIngestionPurpose;
   /** The identifier for the Space to be ingested. */
   spaceID: Scalars['UUID'];
 };
@@ -2640,7 +2624,7 @@ export type Mutation = {
   /** Allow updating the rule for joining rooms: public or invite. */
   adminCommunicationUpdateRoomsJoinRule: Scalars['Boolean'];
   /** Ingests new data into Elasticsearch from scratch. This will delete all existing data and ingest new data from the source. This is an admin only operation. */
-  adminSearchIngestFromScratch: AdminSearchIngestResult;
+  adminSearchIngestFromScratch: Scalars['String'];
   /** Apply to join the specified Community as a member. */
   applyForCommunityMembership: Application;
   /** Assigns an Organization a Role in the specified Community. */
@@ -2901,6 +2885,8 @@ export type Mutation = {
   updateLink: Link;
   /** Updates the specified Organization. */
   updateOrganization: Organization;
+  /** Updates the specified Organization platform settings. */
+  updateOrganizationPlatformSettings: Organization;
   /** Updates the specified Post. */
   updatePost: Post;
   /** Updates the specified PostTemplate. */
@@ -3464,6 +3450,10 @@ export type MutationUpdateLinkArgs = {
 
 export type MutationUpdateOrganizationArgs = {
   organizationData: UpdateOrganizationInput;
+};
+
+export type MutationUpdateOrganizationPlatformSettingsArgs = {
+  organizationData: UpdateOrganizationPlatformSettingsInput;
 };
 
 export type MutationUpdatePostArgs = {
@@ -4507,7 +4497,7 @@ export type SearchInput = {
   tagsetNames?: InputMaybe<Array<Scalars['String']>>;
   /** The terms to be searched for within this Space. Max 5. */
   terms: Array<Scalars['String']>;
-  /** Restrict the search to only the specified entity types. Values allowed: space, subspace, user, group, organization, Default is all. */
+  /** Restrict the search to only the specified entity types. Values allowed: space, subspace, user, group, organization, callout. Default is all. */
   typesFilter?: InputMaybe<Array<Scalars['String']>>;
 };
 
@@ -4527,6 +4517,8 @@ export type SearchResultCallout = SearchResult & {
   id: Scalars['UUID'];
   /** The score for this search result; more matches means a higher score. */
   score: Scalars['Float'];
+  /** The parent Space of the Callout. */
+  space: Space;
   /** The terms that were matched for this result */
   terms: Array<Scalars['String']>;
   /** The type of returned result for this search. */
@@ -4693,6 +4685,11 @@ export type SpaceFilterInput = {
   /** Return Spaces with a Visibility matching one of the provided types. */
   visibilities?: InputMaybe<Array<SpaceVisibility>>;
 };
+
+export enum SpaceIngestionPurpose {
+  Context = 'Context',
+  Knowledge = 'Knowledge',
+}
 
 export enum SpacePrivacyMode {
   Private = 'PRIVATE',
@@ -5296,6 +5293,13 @@ export type UpdateOrganizationInput = {
   /** The Profile of this entity. */
   profileData?: InputMaybe<UpdateProfileInput>;
   website?: InputMaybe<Scalars['String']>;
+};
+
+export type UpdateOrganizationPlatformSettingsInput = {
+  /** Upate the URL path for the Organization. */
+  nameID: Scalars['NameID'];
+  /** The ID of the Organization to update. */
+  organizationID: Scalars['UUID'];
 };
 
 export type UpdateOrganizationPreferenceInput = {
@@ -5933,7 +5937,6 @@ export type ResolversTypes = {
   ActivityLogInput: ActivityLogInput;
   Actor: ResolverTypeWrapper<Actor>;
   ActorGroup: ResolverTypeWrapper<ActorGroup>;
-  AdminSearchIngestResult: ResolverTypeWrapper<AdminSearchIngestResult>;
   Agent: ResolverTypeWrapper<Agent>;
   AgentBeginVerifiedCredentialOfferOutput: ResolverTypeWrapper<AgentBeginVerifiedCredentialOfferOutput>;
   AgentBeginVerifiedCredentialRequestOutput: ResolverTypeWrapper<AgentBeginVerifiedCredentialRequestOutput>;
@@ -6116,8 +6119,6 @@ export type ResolversTypes = {
   GrantOrganizationAuthorizationCredentialInput: GrantOrganizationAuthorizationCredentialInput;
   Groupable: ResolversTypes['Community'] | ResolversTypes['Organization'];
   ISearchResults: ResolverTypeWrapper<ISearchResults>;
-  IngestBatchResult: ResolverTypeWrapper<IngestBatchResult>;
-  IngestResult: ResolverTypeWrapper<IngestResult>;
   IngestSpaceInput: IngestSpaceInput;
   InnovationFlow: ResolverTypeWrapper<InnovationFlow>;
   InnovationFlowState: ResolverTypeWrapper<InnovationFlowState>;
@@ -6241,6 +6242,7 @@ export type ResolversTypes = {
   Space: ResolverTypeWrapper<Space>;
   SpaceDefaults: ResolverTypeWrapper<SpaceDefaults>;
   SpaceFilterInput: SpaceFilterInput;
+  SpaceIngestionPurpose: SpaceIngestionPurpose;
   SpacePrivacyMode: SpacePrivacyMode;
   SpaceSettings: ResolverTypeWrapper<SpaceSettings>;
   SpaceSettingsCollaboration: ResolverTypeWrapper<SpaceSettingsCollaboration>;
@@ -6307,6 +6309,7 @@ export type ResolversTypes = {
   UpdateLinkInput: UpdateLinkInput;
   UpdateLocationInput: UpdateLocationInput;
   UpdateOrganizationInput: UpdateOrganizationInput;
+  UpdateOrganizationPlatformSettingsInput: UpdateOrganizationPlatformSettingsInput;
   UpdateOrganizationPreferenceInput: UpdateOrganizationPreferenceInput;
   UpdatePostInput: UpdatePostInput;
   UpdatePostTemplateInput: UpdatePostTemplateInput;
@@ -6397,7 +6400,6 @@ export type ResolversParentTypes = {
   ActivityLogInput: ActivityLogInput;
   Actor: Actor;
   ActorGroup: ActorGroup;
-  AdminSearchIngestResult: AdminSearchIngestResult;
   Agent: Agent;
   AgentBeginVerifiedCredentialOfferOutput: AgentBeginVerifiedCredentialOfferOutput;
   AgentBeginVerifiedCredentialRequestOutput: AgentBeginVerifiedCredentialRequestOutput;
@@ -6563,8 +6565,6 @@ export type ResolversParentTypes = {
     | ResolversParentTypes['Community']
     | ResolversParentTypes['Organization'];
   ISearchResults: ISearchResults;
-  IngestBatchResult: IngestBatchResult;
-  IngestResult: IngestResult;
   IngestSpaceInput: IngestSpaceInput;
   InnovationFlow: InnovationFlow;
   InnovationFlowState: InnovationFlowState;
@@ -6732,6 +6732,7 @@ export type ResolversParentTypes = {
   UpdateLinkInput: UpdateLinkInput;
   UpdateLocationInput: UpdateLocationInput;
   UpdateOrganizationInput: UpdateOrganizationInput;
+  UpdateOrganizationPlatformSettingsInput: UpdateOrganizationPlatformSettingsInput;
   UpdateOrganizationPreferenceInput: UpdateOrganizationPreferenceInput;
   UpdatePostInput: UpdatePostInput;
   UpdatePostTemplateInput: UpdatePostTemplateInput;
@@ -7229,18 +7230,6 @@ export type ActorGroupResolvers<
   >;
   id?: Resolver<ResolversTypes['UUID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type AdminSearchIngestResultResolvers<
-  ContextType = any,
-  ParentType extends ResolversParentTypes['AdminSearchIngestResult'] = ResolversParentTypes['AdminSearchIngestResult']
-> = {
-  results?: Resolver<
-    Array<ResolversTypes['IngestResult']>,
-    ParentType,
-    ContextType
-  >;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -8331,6 +8320,11 @@ export type ISearchResultsResolvers<
     ParentType,
     ContextType
   >;
+  calloutResultsCount?: Resolver<
+    ResolversTypes['Float'],
+    ParentType,
+    ContextType
+  >;
   contributionResults?: Resolver<
     Array<ResolversTypes['SearchResult']>,
     ParentType,
@@ -8366,29 +8360,6 @@ export type ISearchResultsResolvers<
     ParentType,
     ContextType
   >;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type IngestBatchResultResolvers<
-  ContextType = any,
-  ParentType extends ResolversParentTypes['IngestBatchResult'] = ResolversParentTypes['IngestBatchResult']
-> = {
-  message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type IngestResultResolvers<
-  ContextType = any,
-  ParentType extends ResolversParentTypes['IngestResult'] = ResolversParentTypes['IngestResult']
-> = {
-  batches?: Resolver<
-    Array<ResolversTypes['IngestBatchResult']>,
-    ParentType,
-    ContextType
-  >;
-  index?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  total?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -9075,7 +9046,7 @@ export type MutationResolvers<
     >
   >;
   adminSearchIngestFromScratch?: Resolver<
-    ResolversTypes['AdminSearchIngestResult'],
+    ResolversTypes['String'],
     ParentType,
     ContextType
   >;
@@ -9914,6 +9885,15 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationUpdateOrganizationArgs, 'organizationData'>
+  >;
+  updateOrganizationPlatformSettings?: Resolver<
+    ResolversTypes['Organization'],
+    ParentType,
+    ContextType,
+    RequireFields<
+      MutationUpdateOrganizationPlatformSettingsArgs,
+      'organizationData'
+    >
   >;
   updatePost?: Resolver<
     ResolversTypes['Post'],
@@ -10999,6 +10979,7 @@ export type SearchResultCalloutResolvers<
   callout?: Resolver<ResolversTypes['Callout'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['UUID'], ParentType, ContextType>;
   score?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  space?: Resolver<ResolversTypes['Space'], ParentType, ContextType>;
   terms?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   type?: Resolver<ResolversTypes['SearchResultType'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -11886,7 +11867,6 @@ export type Resolvers<ContextType = any> = {
   ActivityLogEntryUpdateSent?: ActivityLogEntryUpdateSentResolvers<ContextType>;
   Actor?: ActorResolvers<ContextType>;
   ActorGroup?: ActorGroupResolvers<ContextType>;
-  AdminSearchIngestResult?: AdminSearchIngestResultResolvers<ContextType>;
   Agent?: AgentResolvers<ContextType>;
   AgentBeginVerifiedCredentialOfferOutput?: AgentBeginVerifiedCredentialOfferOutputResolvers<ContextType>;
   AgentBeginVerifiedCredentialRequestOutput?: AgentBeginVerifiedCredentialRequestOutputResolvers<ContextType>;
@@ -11944,8 +11924,6 @@ export type Resolvers<ContextType = any> = {
   Geo?: GeoResolvers<ContextType>;
   Groupable?: GroupableResolvers<ContextType>;
   ISearchResults?: ISearchResultsResolvers<ContextType>;
-  IngestBatchResult?: IngestBatchResultResolvers<ContextType>;
-  IngestResult?: IngestResultResolvers<ContextType>;
   InnovationFlow?: InnovationFlowResolvers<ContextType>;
   InnovationFlowState?: InnovationFlowStateResolvers<ContextType>;
   InnovationFlowTemplate?: InnovationFlowTemplateResolvers<ContextType>;
