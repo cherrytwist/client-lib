@@ -619,6 +619,15 @@ export type AssignCommunityRoleToVirtualInput = {
   virtualContributorID: Scalars['UUID_NAMEID'];
 };
 
+export type AssignLicensePlanToAccount = {
+  /** The ID of the Account to assign the LicensePlan to. */
+  accountID: Scalars['UUID'];
+  /** The ID of the LicensePlan to assign. */
+  licensePlanID: Scalars['UUID'];
+  /** The ID of the Licensing to use. */
+  licensingID?: InputMaybe<Scalars['UUID']>;
+};
+
 export type AssignOrganizationRoleToUserInput = {
   organizationID: Scalars['UUID_NAMEID'];
   role: OrganizationRole;
@@ -1596,7 +1605,7 @@ export type CreateOrganizationInput = {
   domain?: InputMaybe<Scalars['String']>;
   legalEntityName?: InputMaybe<Scalars['String']>;
   /** A readable identifier, unique within the containing scope. */
-  nameID: Scalars['NameID'];
+  nameID?: InputMaybe<Scalars['NameID']>;
   profileData: CreateProfileInput;
   website?: InputMaybe<Scalars['String']>;
 };
@@ -1701,7 +1710,7 @@ export type CreateUserInput = {
   gender?: InputMaybe<Scalars['String']>;
   lastName?: InputMaybe<Scalars['String']>;
   /** A readable identifier, unique within the containing scope. */
-  nameID: Scalars['NameID'];
+  nameID?: InputMaybe<Scalars['NameID']>;
   phone?: InputMaybe<Scalars['String']>;
   profileData: CreateProfileInput;
 };
@@ -1711,7 +1720,7 @@ export type CreateVirtualContributorOnAccountInput = {
   bodyOfKnowledgeID?: InputMaybe<Scalars['UUID']>;
   bodyOfKnowledgeType?: InputMaybe<BodyOfKnowledgeType>;
   /** A readable identifier, unique within the containing scope. */
-  nameID: Scalars['NameID'];
+  nameID?: InputMaybe<Scalars['NameID']>;
   profileData: CreateProfileInput;
   virtualPersonaID?: InputMaybe<Scalars['UUID']>;
 };
@@ -2605,13 +2614,19 @@ export type Metadata = {
 export enum MimeType {
   Avif = 'AVIF',
   Bmp = 'BMP',
+  Doc = 'DOC',
+  Docx = 'DOCX',
   Gif = 'GIF',
   Jpeg = 'JPEG',
   Jpg = 'JPG',
+  Ods = 'ODS',
+  Odt = 'ODT',
   Pdf = 'PDF',
   Png = 'PNG',
   Svg = 'SVG',
   Webp = 'WEBP',
+  Xls = 'XLS',
+  Xlsx = 'XLSX',
   Xpng = 'XPNG',
 }
 
@@ -2641,6 +2656,8 @@ export type Mutation = {
   assignCommunityRoleToUser: User;
   /** Assigns a Virtual Contributor to a role in the specified Community. */
   assignCommunityRoleToVirtual: VirtualContributor;
+  /** Assign the specified LicensePlan to an Account. */
+  assignLicensePlanToAccount: Account;
   /** Assigns an Organization Role to user. */
   assignOrganizationRoleToUser: User;
   /** Assigns a platform role to a User. */
@@ -2649,7 +2666,7 @@ export type Mutation = {
   assignUserToGroup: UserGroup;
   /** Reset the Authorization Policy on all entities */
   authorizationPolicyResetAll: Scalars['String'];
-  /** Reset the Authorization Policy on the specified Space. */
+  /** Reset the Authorization Policy on the specified Account. */
   authorizationPolicyResetOnAccount: Account;
   /** Reset the Authorization Policy on the specified Organization. */
   authorizationPolicyResetOnOrganization: Organization;
@@ -2827,6 +2844,8 @@ export type Mutation = {
   revokeCredentialFromOrganization: Organization;
   /** Removes an authorization credential from a User. */
   revokeCredentialFromUser: User;
+  /** Revokes the specified LicensePlan on an Account. */
+  revokeLicensePlanFromAccount: Account;
   /** Sends a reply to a message from the specified Room. */
   sendMessageReplyToRoom: Message;
   /** Send message to Community Leads. */
@@ -2971,6 +2990,10 @@ export type MutationAssignCommunityRoleToUserArgs = {
 
 export type MutationAssignCommunityRoleToVirtualArgs = {
   roleData: AssignCommunityRoleToVirtualInput;
+};
+
+export type MutationAssignLicensePlanToAccountArgs = {
+  planData: AssignLicensePlanToAccount;
 };
 
 export type MutationAssignOrganizationRoleToUserArgs = {
@@ -3320,6 +3343,10 @@ export type MutationRevokeCredentialFromOrganizationArgs = {
 
 export type MutationRevokeCredentialFromUserArgs = {
   revokeCredentialData: RevokeAuthorizationCredentialInput;
+};
+
+export type MutationRevokeLicensePlanFromAccountArgs = {
+  planData: RevokeLicensePlanFromAccount;
 };
 
 export type MutationSendMessageReplyToRoomArgs = {
@@ -4313,6 +4340,15 @@ export type RevokeAuthorizationCredentialInput = {
   userID: Scalars['UUID_NAMEID_EMAIL'];
 };
 
+export type RevokeLicensePlanFromAccount = {
+  /** The ID of the Account to assign the LicensePlan to. */
+  accountID: Scalars['UUID'];
+  /** The ID of the LicensePlan to assign. */
+  licensePlanID: Scalars['UUID'];
+  /** The ID of the Licensing to use. */
+  licensingID?: InputMaybe<Scalars['UUID']>;
+};
+
 export type RevokeOrganizationAuthorizationCredentialInput = {
   /** The Organization from whom the credential is being removed. */
   organizationID: Scalars['UUID'];
@@ -5029,6 +5065,7 @@ export type UpdateCalloutFramingInput = {
   /** The Profile of the Template. */
   profile?: InputMaybe<UpdateProfileInput>;
   whiteboard?: InputMaybe<UpdateWhiteboardInput>;
+  whiteboardContent?: InputMaybe<UpdateWhiteboardContentInput>;
 };
 
 export type UpdateCalloutInput = {
@@ -5916,6 +5953,7 @@ export type ResolversTypes = {
   AssignCommunityRoleToOrganizationInput: SchemaTypes.AssignCommunityRoleToOrganizationInput;
   AssignCommunityRoleToUserInput: SchemaTypes.AssignCommunityRoleToUserInput;
   AssignCommunityRoleToVirtualInput: SchemaTypes.AssignCommunityRoleToVirtualInput;
+  AssignLicensePlanToAccount: SchemaTypes.AssignLicensePlanToAccount;
   AssignOrganizationRoleToUserInput: SchemaTypes.AssignOrganizationRoleToUserInput;
   AssignPlatformRoleToUserInput: SchemaTypes.AssignPlatformRoleToUserInput;
   AssignUserGroupMemberInput: SchemaTypes.AssignUserGroupMemberInput;
@@ -6174,6 +6212,7 @@ export type ResolversTypes = {
   RemovePlatformRoleFromUserInput: SchemaTypes.RemovePlatformRoleFromUserInput;
   RemoveUserGroupMemberInput: SchemaTypes.RemoveUserGroupMemberInput;
   RevokeAuthorizationCredentialInput: SchemaTypes.RevokeAuthorizationCredentialInput;
+  RevokeLicensePlanFromAccount: SchemaTypes.RevokeLicensePlanFromAccount;
   RevokeOrganizationAuthorizationCredentialInput: SchemaTypes.RevokeOrganizationAuthorizationCredentialInput;
   RolesOrganizationInput: SchemaTypes.RolesOrganizationInput;
   RolesResult: ResolverTypeWrapper<SchemaTypes.RolesResult>;
@@ -6384,6 +6423,7 @@ export type ResolversParentTypes = {
   AssignCommunityRoleToOrganizationInput: SchemaTypes.AssignCommunityRoleToOrganizationInput;
   AssignCommunityRoleToUserInput: SchemaTypes.AssignCommunityRoleToUserInput;
   AssignCommunityRoleToVirtualInput: SchemaTypes.AssignCommunityRoleToVirtualInput;
+  AssignLicensePlanToAccount: SchemaTypes.AssignLicensePlanToAccount;
   AssignOrganizationRoleToUserInput: SchemaTypes.AssignOrganizationRoleToUserInput;
   AssignPlatformRoleToUserInput: SchemaTypes.AssignPlatformRoleToUserInput;
   AssignUserGroupMemberInput: SchemaTypes.AssignUserGroupMemberInput;
@@ -6609,6 +6649,7 @@ export type ResolversParentTypes = {
   RemovePlatformRoleFromUserInput: SchemaTypes.RemovePlatformRoleFromUserInput;
   RemoveUserGroupMemberInput: SchemaTypes.RemoveUserGroupMemberInput;
   RevokeAuthorizationCredentialInput: SchemaTypes.RevokeAuthorizationCredentialInput;
+  RevokeLicensePlanFromAccount: SchemaTypes.RevokeLicensePlanFromAccount;
   RevokeOrganizationAuthorizationCredentialInput: SchemaTypes.RevokeOrganizationAuthorizationCredentialInput;
   RolesOrganizationInput: SchemaTypes.RolesOrganizationInput;
   RolesResult: SchemaTypes.RolesResult;
@@ -9256,6 +9297,15 @@ export type MutationResolvers<
       'roleData'
     >
   >;
+  assignLicensePlanToAccount?: Resolver<
+    ResolversTypes['Account'],
+    ParentType,
+    ContextType,
+    RequireFields<
+      SchemaTypes.MutationAssignLicensePlanToAccountArgs,
+      'planData'
+    >
+  >;
   assignOrganizationRoleToUser?: Resolver<
     ResolversTypes['User'],
     ParentType,
@@ -9937,6 +9987,15 @@ export type MutationResolvers<
     RequireFields<
       SchemaTypes.MutationRevokeCredentialFromUserArgs,
       'revokeCredentialData'
+    >
+  >;
+  revokeLicensePlanFromAccount?: Resolver<
+    ResolversTypes['Account'],
+    ParentType,
+    ContextType,
+    RequireFields<
+      SchemaTypes.MutationRevokeLicensePlanFromAccountArgs,
+      'planData'
     >
   >;
   sendMessageReplyToRoom?: Resolver<
