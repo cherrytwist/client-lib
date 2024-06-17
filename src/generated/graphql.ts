@@ -721,6 +721,7 @@ export enum AuthorizationPrivilege {
   AccessVirtualContributor = 'ACCESS_VIRTUAL_CONTRIBUTOR',
   AuthorizationReset = 'AUTHORIZATION_RESET',
   CommunityAddMember = 'COMMUNITY_ADD_MEMBER',
+  CommunityAddMemberVcFromAccount = 'COMMUNITY_ADD_MEMBER_VC_FROM_ACCOUNT',
   CommunityApply = 'COMMUNITY_APPLY',
   CommunityInvite = 'COMMUNITY_INVITE',
   CommunityInviteAccept = 'COMMUNITY_INVITE_ACCEPT',
@@ -2087,23 +2088,9 @@ export type ISearchResults = {
   journeyResultsCount: Scalars['Float'];
 };
 
-export type IngestBatchResult = {
-  /** A message to describe the result of the operation. */
-  message?: Maybe<Scalars['String']>;
-  /** Whether the operation was successful. */
-  success: Scalars['Boolean'];
-};
-
-export type IngestResult = {
-  /** The result of the operation. */
-  batches: Array<IngestBatchResult>;
-  /** The index that the documents were ingested into. */
-  index: Scalars['String'];
-  /** Amount of documents indexed. */
-  total?: Maybe<Scalars['Float']>;
-};
-
 export type IngestSpaceInput = {
+  /** The purpose of the ingestions - either knowledge or context. */
+  purpose: SpaceIngestionPurpose;
   /** The identifier for the Space to be ingested. */
   spaceID: Scalars['UUID'];
 };
@@ -2611,13 +2598,19 @@ export type Metadata = {
 export enum MimeType {
   Avif = 'AVIF',
   Bmp = 'BMP',
+  Doc = 'DOC',
+  Docx = 'DOCX',
   Gif = 'GIF',
   Jpeg = 'JPEG',
   Jpg = 'JPG',
+  Ods = 'ODS',
+  Odt = 'ODT',
   Pdf = 'PDF',
   Png = 'PNG',
   Svg = 'SVG',
   Webp = 'WEBP',
+  Xls = 'XLS',
+  Xlsx = 'XLSX',
   Xpng = 'XPNG',
 }
 
@@ -2899,6 +2892,8 @@ export type Mutation = {
   updateLink: Link;
   /** Updates the specified Organization. */
   updateOrganization: Organization;
+  /** Updates the specified Organization platform settings. */
+  updateOrganizationPlatformSettings: Organization;
   /** Updates the specified Post. */
   updatePost: Post;
   /** Updates the specified PostTemplate. */
@@ -3462,6 +3457,10 @@ export type MutationUpdateLinkArgs = {
 
 export type MutationUpdateOrganizationArgs = {
   organizationData: UpdateOrganizationInput;
+};
+
+export type MutationUpdateOrganizationPlatformSettingsArgs = {
+  organizationData: UpdateOrganizationPlatformSettingsInput;
 };
 
 export type MutationUpdatePostArgs = {
@@ -4694,6 +4693,11 @@ export type SpaceFilterInput = {
   visibilities?: InputMaybe<Array<SpaceVisibility>>;
 };
 
+export enum SpaceIngestionPurpose {
+  Context = 'CONTEXT',
+  Knowledge = 'KNOWLEDGE',
+}
+
 export enum SpacePrivacyMode {
   Private = 'PRIVATE',
   Public = 'PUBLIC',
@@ -5296,6 +5300,13 @@ export type UpdateOrganizationInput = {
   /** The Profile of this entity. */
   profileData?: InputMaybe<UpdateProfileInput>;
   website?: InputMaybe<Scalars['String']>;
+};
+
+export type UpdateOrganizationPlatformSettingsInput = {
+  /** Upate the URL path for the Organization. */
+  nameID: Scalars['NameID'];
+  /** The ID of the Organization to update. */
+  organizationID: Scalars['UUID'];
 };
 
 export type UpdateOrganizationPreferenceInput = {
@@ -6115,8 +6126,6 @@ export type ResolversTypes = {
   GrantOrganizationAuthorizationCredentialInput: SchemaTypes.GrantOrganizationAuthorizationCredentialInput;
   Groupable: ResolversTypes['Community'] | ResolversTypes['Organization'];
   ISearchResults: ResolverTypeWrapper<SchemaTypes.ISearchResults>;
-  IngestBatchResult: ResolverTypeWrapper<SchemaTypes.IngestBatchResult>;
-  IngestResult: ResolverTypeWrapper<SchemaTypes.IngestResult>;
   IngestSpaceInput: SchemaTypes.IngestSpaceInput;
   InnovationFlow: ResolverTypeWrapper<SchemaTypes.InnovationFlow>;
   InnovationFlowState: ResolverTypeWrapper<SchemaTypes.InnovationFlowState>;
@@ -6242,6 +6251,7 @@ export type ResolversTypes = {
   Space: ResolverTypeWrapper<SchemaTypes.Space>;
   SpaceDefaults: ResolverTypeWrapper<SchemaTypes.SpaceDefaults>;
   SpaceFilterInput: SchemaTypes.SpaceFilterInput;
+  SpaceIngestionPurpose: SchemaTypes.SpaceIngestionPurpose;
   SpacePrivacyMode: SchemaTypes.SpacePrivacyMode;
   SpaceSettings: ResolverTypeWrapper<SchemaTypes.SpaceSettings>;
   SpaceSettingsCollaboration: ResolverTypeWrapper<SchemaTypes.SpaceSettingsCollaboration>;
@@ -6310,6 +6320,7 @@ export type ResolversTypes = {
   UpdateLinkInput: SchemaTypes.UpdateLinkInput;
   UpdateLocationInput: SchemaTypes.UpdateLocationInput;
   UpdateOrganizationInput: SchemaTypes.UpdateOrganizationInput;
+  UpdateOrganizationPlatformSettingsInput: SchemaTypes.UpdateOrganizationPlatformSettingsInput;
   UpdateOrganizationPreferenceInput: SchemaTypes.UpdateOrganizationPreferenceInput;
   UpdatePostInput: SchemaTypes.UpdatePostInput;
   UpdatePostTemplateInput: SchemaTypes.UpdatePostTemplateInput;
@@ -6568,8 +6579,6 @@ export type ResolversParentTypes = {
     | ResolversParentTypes['Community']
     | ResolversParentTypes['Organization'];
   ISearchResults: SchemaTypes.ISearchResults;
-  IngestBatchResult: SchemaTypes.IngestBatchResult;
-  IngestResult: SchemaTypes.IngestResult;
   IngestSpaceInput: SchemaTypes.IngestSpaceInput;
   InnovationFlow: SchemaTypes.InnovationFlow;
   InnovationFlowState: SchemaTypes.InnovationFlowState;
@@ -6737,6 +6746,7 @@ export type ResolversParentTypes = {
   UpdateLinkInput: SchemaTypes.UpdateLinkInput;
   UpdateLocationInput: SchemaTypes.UpdateLocationInput;
   UpdateOrganizationInput: SchemaTypes.UpdateOrganizationInput;
+  UpdateOrganizationPlatformSettingsInput: SchemaTypes.UpdateOrganizationPlatformSettingsInput;
   UpdateOrganizationPreferenceInput: SchemaTypes.UpdateOrganizationPreferenceInput;
   UpdatePostInput: SchemaTypes.UpdatePostInput;
   UpdatePostTemplateInput: SchemaTypes.UpdatePostTemplateInput;
@@ -8505,37 +8515,6 @@ export type ISearchResultsResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type IngestBatchResultResolvers<
-  ContextType = any,
-  ParentType extends ResolversParentTypes['IngestBatchResult'] = ResolversParentTypes['IngestBatchResult']
-> = {
-  message?: Resolver<
-    SchemaTypes.Maybe<ResolversTypes['String']>,
-    ParentType,
-    ContextType
-  >;
-  success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type IngestResultResolvers<
-  ContextType = any,
-  ParentType extends ResolversParentTypes['IngestResult'] = ResolversParentTypes['IngestResult']
-> = {
-  batches?: Resolver<
-    Array<ResolversTypes['IngestBatchResult']>,
-    ParentType,
-    ContextType
-  >;
-  index?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  total?: Resolver<
-    SchemaTypes.Maybe<ResolversTypes['Float']>,
-    ParentType,
-    ContextType
-  >;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
 export type InnovationFlowResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['InnovationFlow'] = ResolversParentTypes['InnovationFlow']
@@ -10222,6 +10201,15 @@ export type MutationResolvers<
     ContextType,
     RequireFields<
       SchemaTypes.MutationUpdateOrganizationArgs,
+      'organizationData'
+    >
+  >;
+  updateOrganizationPlatformSettings?: Resolver<
+    ResolversTypes['Organization'],
+    ParentType,
+    ContextType,
+    RequireFields<
+      SchemaTypes.MutationUpdateOrganizationPlatformSettingsArgs,
       'organizationData'
     >
   >;
@@ -12359,8 +12347,6 @@ export type Resolvers<ContextType = any> = {
   Geo?: GeoResolvers<ContextType>;
   Groupable?: GroupableResolvers<ContextType>;
   ISearchResults?: ISearchResultsResolvers<ContextType>;
-  IngestBatchResult?: IngestBatchResultResolvers<ContextType>;
-  IngestResult?: IngestResultResolvers<ContextType>;
   InnovationFlow?: InnovationFlowResolvers<ContextType>;
   InnovationFlowState?: InnovationFlowStateResolvers<ContextType>;
   InnovationFlowTemplate?: InnovationFlowTemplateResolvers<ContextType>;
