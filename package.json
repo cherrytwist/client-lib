@@ -26,6 +26,9 @@
     "url": "https://github.com/alkemio/Client.Lib/issues"
   },
   "homepage": "https://github.com/alkemio/Client.Lib#readme",
+  "overrides": {
+    "ws": "8.17.1"
+  },
   "devDependencies": {
     "@graphql-codegen/add": "^3.2.1",
     "@graphql-codegen/cli": "^2.11.8",
@@ -52,7 +55,7 @@
     "ts-node-dev": "^2.0.0"
   },
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "1.7.9",
     "graphql-request": "^3.3.0",
     "graphql-tag": "^2.11.0",
     "semver": "^7.3.4",
