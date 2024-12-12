@@ -1,6 +1,6 @@
 {
   "name": "@alkemio/client-lib",
-  "version": "0.32.0",
+  "version": "0.33.0",
   "description": "Library for interacting with a Alkemio server instance",
   "author": "Alkemio Foundation",
   "private": false,
@@ -26,43 +26,41 @@
     "url": "https://github.com/alkemio/Client.Lib/issues"
   },
   "homepage": "https://github.com/alkemio/Client.Lib#readme",
+  "overrides": {
+    "ws": "8.17.1"
+  },
   "devDependencies": {
     "@graphql-codegen/add": "^3.2.1",
     "@graphql-codegen/cli": "^2.11.8",
-    "@graphql-codegen/typescript": "2.7.3",
-    "@graphql-codegen/typescript-resolvers": "2.7.3",
     "@graphql-codegen/import-types-preset": "^2.2.3",
     "@graphql-codegen/typed-document-node": "^2.3.3",
+    "@graphql-codegen/typescript": "2.7.3",
     "@graphql-codegen/typescript-graphql-request": "^4.5.3",
     "@graphql-codegen/typescript-operations": "2.5.3",
+    "@graphql-codegen/typescript-resolvers": "2.7.3",
+    "@types/graphql-upload": "^8.0.11",
     "@types/node": "^14.14.10",
     "@types/semver": "^7.3.4",
     "@types/supertest": "^2.0.8",
-    "@types/url-join": "^4.0.1",
     "@typescript-eslint/eslint-plugin": "^4.9.0",
     "@typescript-eslint/parser": "^4.9.0",
+    "dotenv": "^16.0.1",
     "eslint": "^7.14.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-prettier": "^3.1.4",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
     "supertest": "^4.0.2",
-    "typescript": "^4.1.2",
-    "dotenv": "^16.0.1",
-    "ts-node-dev": "^2.0.0"
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^4.7.4"
   },
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "1.7.9",
+    "graphql": "^16.6.0",
     "graphql-request": "^3.3.0",
     "graphql-tag": "^2.11.0",
-    "semver": "^7.3.4",
-    "url-join": "^4.0.1",
-    "@graphql-codegen/typescript-graphql-request": "^4.5.3",
-    "@graphql-codegen/typescript-operations": "^2.5.3",
-    "@types/graphql-upload": "^8.0.11",
-    "graphql": "^16.6.0",
     "graphql-upload": "^16.0.1",
-    "typescript": "^4.7.4",
+    "semver": "^7.3.4",
     "winston": "^3.8.1"
   },
   "files": [
