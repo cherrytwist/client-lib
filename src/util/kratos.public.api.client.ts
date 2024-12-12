@@ -39,7 +39,7 @@ export class KratosPublicApiClient extends HttpClient {
       '/self-service/login/api',
       this.config
     );
-    return await this.buildActionURI(kratosData.ui?.action);
+    return this.buildActionURI(kratosData.ui?.action);
   }
 
   /**
@@ -73,13 +73,16 @@ export class KratosPublicApiClient extends HttpClient {
   // Essentially without this an API token can not be received cross-domain, if the application
   // using client lib can't resolve the endpoints in kratos.yml.
 
-  private async buildActionURI(kratosActionURL: string): Promise<string> {
+  private buildActionURI(kratosActionURL: string): string {
     const regex = '(flow=[a-zA-Z0-9-]*)';
     const found = kratosActionURL.match(regex);
     if (!found) {
       throw new Error('Could not get Kratos Action URI for API flow!');
     }
-
-    return new URL(this.apiBaseURL, `self-service/login?${found[0]}`).href;
+    // attach / at the end of the base URL if it is missing
+    // or the URL will be malformed
+    const baseUrl =
+      this.apiBaseURL + (this.apiBaseURL.endsWith('/') ? '' : '/');
+    return new URL(`self-service/login?${found[0]}`, baseUrl).href;
   }
 }
